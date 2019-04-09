@@ -1,0 +1,18 @@
+FROM ubuntu:16.04
+
+
+RUN apt-get update && apt-get install -y tahoe-lafs python-pip
+RUN pip install cffi==1.11.5
+RUN mkdir /tahoe && ln -s /tahoe /.tahoe
+
+#RUN useradd -m -d /tahoe -s /bin/bash tahoe
+#RUN mkdir -p /tahoe  && chown -R tahoe /tahoe
+#USER tahoe
+
+WORKDIR /tahoe
+
+VOLUME ["/tahoe"]
+
+RUN tahoe create-node --nickname=$HOSTNAME --introducer=pb://vsnrpons7gynujqrzg6yw7kj2tvrtalm@tcp:52.39.131.122:1234/3rcieylxps4efdfivbolb7eqawnmbsjv
+RUN tahoe create-node --nickname=$HOSTNAME --helper=pb://yhuml7yzkv7xdmtyudmkazdfnm6nwnag@tcp:35.162.142.160:1234/7plaaj7gffbxksnk55p6jyyogmqnjhcp
+RUN tahoe start

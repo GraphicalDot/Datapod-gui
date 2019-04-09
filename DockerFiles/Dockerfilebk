@@ -1,0 +1,51 @@
+From ubuntu:16.04
+RUN apt-get update && apt-get install -y 
+
+libsdl2-dev 
+libsdl2-image-dev
+libsdl2-mixer-dev 
+libsdl2-ttf-dev 
+
+pkg-config 
+libgl1-mesa-dev 
+libgles2-mesa-dev 
+python-setuptools 
+libgstreamer1.0-dev 
+git-core
+python-dev 
+gcc 
+python-pip 
+gstreamer1.0-plugins-base 
+gstreamer1.0-plugins-good 
+gstreamer1.0-plugins-bad 
+gstreamer1.0-plugins-ugly 
+gstreamer1.0-alsa 
+gstreamer1.0-omx 
+xclip
+libmtdev-dev 
+python-pygame
+
+RUN pip install cython
+
+RUN pip install git+https://github.com/kivy/kivy.git@master
+
+ENV XDG_RUNTIME_DIR=/run/user/1000
+
+# Set the working directory to /app
+WORKDIR /app
+# Copy the current directory contents into the container at /app
+ADD . /app
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Define environment variable
+ENV NAME World
+CMD ["/bin/bash"]
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]
+
+
+#docker run -it --cpus=".5" ubuntu /bin/bashwq
+

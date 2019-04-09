@@ -1,0 +1,29 @@
+> mkdir /tmp/ipfs-docker-staging
+> mkdir /tmp/ipfs-docker-data
+> docker run -d --name ipfs-node \
+  -v /tmp/ipfs-docker-staging:/export -v /tmp/ipfs-docker-data:/data/ipfs \
+  -p 8080:8080 -p 4001:4001 -p 127.0.0.1:5001:5001 \
+  jbenet/go-ipfs:latest
+faa8f714398c7a1a5a29adc2aed01857b41444ed53ec11863a3136ad37c8064c
+
+
+Login into Docker containers
+docker run -d -p 2222:22 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e CONTAINER=my-container -e AUTH_MECHANISM=noAuth \
+  jeroenpeeters/docker-ssh
+
+ssh localhost -p 2222
+
+
+up vote
+157
+down vote
+
+To bash into a running container, type this:
+
+docker exec -t -i container_name /bin/bash
+
+Once the image has downloaded, we're going to run it such that we can use the terminal window like so:
+
+sudo docker run --name nginx-template-base -p 8080:80 -e TERM=xterm -d nginx

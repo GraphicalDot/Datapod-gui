@@ -1,0 +1,148 @@
+#:kivy 1.10.0
+
+
+
+<UserRegistration>:
+    BoxLayout:
+        orientation: "vertical"
+        
+        BoxLayout:
+            size_hint_y: 0.2
+            padding: [10, 10, 10, 10]
+            orientation: "horizontal"
+            Label:
+                text: "Username"
+            TextInput:
+                id: username
+                hint_text: "username"
+                text:''
+                multiline: False
+
+        BoxLayout:
+            size_hint_y: 0.2
+            padding: [10, 10, 10, 10]
+            orientation: "horizontal"
+            Label:
+                text: "Password"
+            TextInput:
+                id: password
+                hint_text: "password"
+                password: True
+                text:''
+                multiline: False
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.2
+            padding: [10, 10, 10, 10]
+            Label:
+                text: "Repeat Password"
+            TextInput:
+                id: repeat_password
+                hint_text: "repeat password"
+                password: True
+                text:''
+                multiline: False
+
+        BoxLayout:
+            size_hint_y: 0.2
+            padding: [10, 10, 10, 10]
+
+            orientation: "horizontal"
+            Label:
+                text: "Email Id"
+            TextInput:
+                id: email_id
+                hint_text: "email id"
+                text:''
+                multiline: False
+
+        BoxLayout:
+            size_hint_y: 0.2
+            padding: [10, 10, 10, 10]
+
+            orientation: "horizontal"
+            Label:
+                text: "Phone number"
+            TextInput:
+                id: phone_number
+                hint_text: "phone number"
+                text:''
+                multiline: False
+
+        #BoxLayout:
+        #    size_hint_y: 0.2
+        #    padding: [10, 10, 10, 10]#
+
+        #    orientation: "horizontal"
+        #    Label:
+        #        text: "Adhaar number"
+        #    TextInput:
+        #        id: adhaar_number
+        #        hint_text: "adhaar number"
+        ##        text:''
+        #      multiline: False
+
+
+
+        #BoxLayout:
+        #    size_hint_y: 0.2
+        #    padding: [10, 10, 10, 10]#
+        #
+        #    orientation: "horizontal"
+        #    Label:
+        #        text: "SocialID front"
+        #    TextInput:
+        #        id: socialidfront
+        #        text: root.file
+        #        multiline: False                    
+        #    Button:
+        #        text: 'Load'
+        #        on_press: root.open("socialidfront")
+
+                
+            
+                
+        #BoxLayout:
+        #    padding: [10, 10, 10, 10]
+        #    orientation: "horizontal"
+        #    size_hint_y: 0.2
+        #    Label:
+        #        text: "SocialID back"
+        #    TextInput:
+        #        id:socialidback
+        #        text: root.file
+        #        multiline: False
+        #    Button:
+        #        text: 'Load'
+        #        on_press: root.open("socialidback")
+
+        #BoxLayout:
+        #    padding: [10, 10, 10, 10]
+        #    size_hint_y: 0.2
+        #    orientation: "horizontal"
+        #    Label:
+        #        text: "self image"
+        #    TextInput:
+        #        id:selfimage
+        #        text: root.file
+        #        multiline: False
+        #    Button:
+        #        text: 'Load'
+        #        on_press: root.open("selfimage")
+
+
+
+        BoxLayout:
+            orientation: "horizontal"
+            padding: 10,10,10,10
+            spacing: 10
+            size_hint_y: 0.2
+        
+            Button:
+                on_press: root.on_submit(username.text, password.text, repeat_password.text, email_id.text, phone_number.text)
+                text: "Submit"
+            Button:
+                text: "Cancel"
+                on_press: root.on_cancel()
+
