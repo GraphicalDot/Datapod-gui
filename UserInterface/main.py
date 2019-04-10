@@ -8,7 +8,7 @@ from kivy.properties import ObjectProperty
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
-
+import json
 from kivy.properties import StringProperty
 from kivy.clock import Clock
 import time
@@ -27,11 +27,23 @@ from SettingsModule import global_variables
 #from DecentralizeFileSystem.ipfs_decentralize_filesystem import IPFS
 from alert import Alert
 from kivy.config import Config
-from LoggingModule.logging import feynlog
+from LoggingModule.logging import logger_log
 #https://www.colorcombos.com/color-schemes/192/ColorCombo192.html
 from kivy.core.window import Window
 
 
+"""
+import coloredlogs, verboselogs, logging
+verboselogs.install()
+coloredlogs.install()
+logger = logging.getLogger(__name__)
+"""
+def load_config():  # pylint: disable=too-many-branches
+    #app.config.update(DEFAULT_CONFIG)
+
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+    return config
 
 class LoginPage(Screen):
     def do_login(self, loginText, passwordText):
@@ -41,7 +53,7 @@ class LoginPage(Screen):
         print (app.get_application_config())
 
         app.username = loginText
-        feynlog.info("This is the password text %s"%passwordText)
+        logger_log.info("This is the password text %s"%passwordText)
         app.password = hashlib.sha1(passwordText.encode("utf-8")).hexdigest()
 
 
@@ -57,11 +69,11 @@ class LoginPage(Screen):
             global_variables.app_token = r.json()["data"]["token"]
 
         except Exception as e:
-            feynlog.debug(str(e))
+            logger_log.debug(str(e))
             Alert(title='Feynmen error message', text="Remote server id not responding")
 
         if not r.json()["success"]:
-            feynlog.error("The user doesnt exists")
+            logger_log.error("The user doesnt exists")
             content = Button(text='Close me!')
             popup = Popup(content=content, auto_dismiss=False)
 
@@ -76,7 +88,7 @@ class LoginPage(Screen):
         try:
             r.json()["data"]["user"]
         except Exception as e:
-            feynlog.debug(e)
+            logger_log.debug(e)
             Alert(title='Feynmen error message', text=r.json()["message"])
 
         global_variables.username = app.username
@@ -87,8 +99,8 @@ class LoginPage(Screen):
         _class.check_filesystem()
 
 
-        #feynlog.debug("This is the ipfs config file present on the node %s"%global_variables.ipfs_config)
-        #feynlog.debug("This is the ipfs config file deleivered from the central server %s"%r.json()["data"]["user"]["ipfs_config"])
+        #logger_log.debug("This is the ipfs config file present on the node %s"%global_variables.ipfs_config)
+        #logger_log.debug("This is the ipfs config file deleivered from the central server %s"%r.json()["data"]["user"]["ipfs_config"])
 
 
         
@@ -104,7 +116,7 @@ class LoginPage(Screen):
         self.manager.add_widget(UserPage(name='User'))
         
 
-        feynlog.debug(r.json()["data"])
+        logger_log.debug(r.json()["data"])
         self.manager.get_screen('User').data = r.json()["data"]
 
         self.manager.get_screen('User').encryption_public_key = global_variables.encryption_public_key
@@ -147,8 +159,12 @@ class MainApp(App):
 
 
 def main():
-    Config.set('graphics', 'width', '1000')
-    Config.set('graphics', 'height', '600')
+    config = load_config()
+    print (config)
+    Config.setdefaults("dsds", config) 
+
+    #Config.set('graphics', 'width', '1000')
+    #Config.set('graphics', 'height', '600')
     Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
     Config.write()
     Window.borderless = False
@@ -157,10 +173,10 @@ def main():
 
 
 if __name__ == "__main__":
-    #feynlogger.debug("This is the password text %s"%"passwordText")
-    #feynlogger.info("This is the password text %s"%"passwordText")
-    #feynlogger.error("This is the password text %s"%"passwordText")
-    #feynlogger.warning("This is the password text %s"%"passwordText")
+    #logger_logger.debug("This is the password text %s"%"passwordText")
+    #logger_logger.info("This is the password text %s"%"passwordText")
+    #logger_logger.error("This is the password text %s"%"passwordText")
+    #logger_logger.warning("This is the password text %s"%"passwordText")
     main()    
 
 

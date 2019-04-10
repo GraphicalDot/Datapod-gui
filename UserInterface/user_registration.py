@@ -16,7 +16,7 @@ from alert import Alert
 from SettingsModule.settings import api_server
 import requests
 import re
-from LoggingModule.logging import feynlog
+from LoggingModule.logging import logger_log
 
 
 
@@ -64,7 +64,7 @@ class UserRegistration(Screen):
         f.text = self.file
         self.popup.dismiss()
 
-    def on_submit(self, username, password, repeat_password, email, phone_number):
+    def on_submit(self):
         """
         Make an api request with the data to confirm the user registraion
         After succeful registration reset the form 
@@ -72,6 +72,11 @@ class UserRegistration(Screen):
         #TODO form validation with cerberus
         #TODO Check if macid is available from the host or not
         #TODO check if ip address
+
+        text = App.get_running_app().config
+        print (text)
+
+        """
         print (username, password, repeat_password, email, phone_number)
         if password != repeat_password:
             Alert(title='Feynmen error message', text='Password must match')
@@ -105,6 +110,7 @@ class UserRegistration(Screen):
         Alert(title='Feynmen error message', text=r.json()["message"])
         
         self.go_to_login()
+        """
         return        
     
     def on_cancel(self):

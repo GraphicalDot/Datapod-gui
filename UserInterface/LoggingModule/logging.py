@@ -34,7 +34,7 @@ def configure_logger(name, log_path):
     })
     return logging.getLogger(name)
 
-feynlog = configure_logger('default', 'Logs/feynmenapp.log')
+logger_log = configure_logger('default', 'Logs/app.logs')
 #feynlog.debug('debug message!')
 #feynlog.info('info message!')
 #feynlog.error('error message')

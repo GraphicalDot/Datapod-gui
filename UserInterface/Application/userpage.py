@@ -19,7 +19,7 @@ from kivy.utils import platform
 from kivy.uix.popup import Popup
 import subprocess
 #from DecentralizeFileSystem.ipfs_decentralize_filesystem import IPFS
-from LoggingModule.logging import feynlog
+from LoggingModule.logging import logger_log
 from SettingsModule import global_variables
 import os
 import requests
@@ -57,7 +57,7 @@ class UserPage(Screen):
         if self.data:
             f = MTable(self.data, cols=4)
             self.ids.tab_1.add_widget(f)
-        feynlog.debug("This is the data we are looking at %s"%self.data)
+        logger_log.debug("This is the data we are looking at %s"%self.data)
         Clock.schedule_interval(self.update, 1)
 
 
@@ -115,7 +115,7 @@ class UserPage(Screen):
 
         f = self.ids[self.textid]
         f.text = self.file
-        feynlog.debug("This is the dile name %s"%f.text)
+        logger_log.debug("This is the dile name %s"%f.text)
         self.popup.dismiss()
 
     def save_on_filesystem(self):
@@ -130,7 +130,7 @@ class UserPage(Screen):
         
         ##Instead use some key value database pair
         r = requests.get("http://localhost:8888/storage", params={"user_id": global_variables.user_id})    
-        feynlog.debug(r.json()["data"])
+        logger_log.debug(r.json()["data"])
         self.data = r.json()["data"]
 
         self.update()

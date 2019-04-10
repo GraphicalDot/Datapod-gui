@@ -18,57 +18,57 @@
                 text:''
                 multiline: False
 
-        BoxLayout:
-            size_hint_y: 0.2
-            padding: [10, 10, 10, 10]
-            orientation: "horizontal"
-            Label:
-                text: "Password"
-            TextInput:
-                id: password
-                hint_text: "password"
-                password: True
-                text:''
-                multiline: False
+        #BoxLayout:
+        #    size_hint_y: 0.2
+        #    padding: [10, 10, 10, 10]
+        #    orientation: "horizontal"
+        #    Label:
+        #        text: "Password"
+        #    TextInput:
+        #        id: password
+        #        hint_text: "password"
+        #        password: True
+        #        text:''
+        #        multiline: False
 
-        BoxLayout:
-            orientation: "horizontal"
-            size_hint_y: 0.2
-            padding: [10, 10, 10, 10]
-            Label:
-                text: "Repeat Password"
-            TextInput:
-                id: repeat_password
-                hint_text: "repeat password"
-                password: True
-                text:''
-                multiline: False
+        #BoxLayout:
+        #    orientation: "horizontal"
+        #    size_hint_y: 0.2
+        #    padding: [10, 10, 10, 10]
+        #    Label:
+        #        text: "Repeat Password"
+        #    TextInput:
+        #        id: repeat_password
+        #        hint_text: "repeat password"
+        #        password: True
+        #        text:''
+        #        multiline: False
 
-        BoxLayout:
-            size_hint_y: 0.2
-            padding: [10, 10, 10, 10]
+        #BoxLayout:
+        #    size_hint_y: 0.2
+        #    padding: [10, 10, 10, 10]
 
-            orientation: "horizontal"
-            Label:
-                text: "Email Id"
-            TextInput:
-                id: email_id
-                hint_text: "email id"
-                text:''
-                multiline: False
+        #    orientation: "horizontal"
+        #    Label:
+        #        text: "Email Id"
+        #    TextInput:
+        #        id: email_id
+        #        hint_text: "email id"
+        #        text:''
+        #        multiline: False
 
-        BoxLayout:
-            size_hint_y: 0.2
-            padding: [10, 10, 10, 10]
+        #BoxLayout:
+        #    size_hint_y: 0.2
+        #    padding: [10, 10, 10, 10]
 
-            orientation: "horizontal"
-            Label:
-                text: "Phone number"
-            TextInput:
-                id: phone_number
-                hint_text: "phone number"
-                text:''
-                multiline: False
+        #    orientation: "horizontal"
+        #    Label:
+        #        text: "Phone number"
+        #    TextInput:
+        #        id: phone_number
+        #        hint_text: "phone number"
+        #        text:''
+        #        multiline: False
 
         #BoxLayout:
         #    size_hint_y: 0.2
@@ -137,11 +137,11 @@
             orientation: "horizontal"
             padding: 10,10,10,10
             spacing: 10
-            size_hint_y: 0.2
+            size_hint_y: 0.05
         
             Button:
-                on_press: root.on_submit(username.text, password.text, repeat_password.text, email_id.text, phone_number.text)
-                text: "Submit"
+                on_press: root.on_submit()
+                text: "Generate Mnemonic"
             Button:
                 text: "Cancel"
                 on_press: root.on_cancel()
