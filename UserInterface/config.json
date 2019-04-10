@@ -1,13 +1,1 @@
-
-
-
-{   "MNEMONIC": null,
-    "ZERO_PRIVATE_KEY": null,
-    "ZERO_PUBLIC_KEY": null,
-    "GO_API": "13.233.226.186",
-    "GRPAHICS": {
-        "width": "1000",
-        "height": "600"
-
-    }
-}
+{"MNEMONIC": null, "ZERO_PRIVATE_KEY": null, "ZERO_PUBLIC_KEY": null, "GO_API": "13.233.226.186", "GRPAHICS": {"width": "1000", "height": "600"}, "mnemonic": {"value": "6f99e30085a4c63b271abfe84c23b312561237a482c71b160dfe205945fb07bb5f763e7c96c052040e860865b7ee2a4c5d7d22d2cfa28703b5028c2a7928fa3d66b97f4537cb407bba0a8e5ade547500cdf356f415db7c25d2005511be8232f40592180dfb85ab264cf8e6281db1559401b11825fce342a287a9ff8cb7f1e712b8a1e2526c83ff37d1ea779c1cfd9531dbcba5d890a1497e2331dcc19c4c7777c3ecd1d4449068183be045372cd9f23aa80589914db8", "salt": "df08c1fc7c1389cbb8cffb21c8ad9740"}, "password": {"value": "Groot1234#"}}

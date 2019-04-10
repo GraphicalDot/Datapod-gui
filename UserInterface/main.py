@@ -30,40 +30,55 @@ from kivy.config import Config
 from LoggingModule.logging import logger_log
 #https://www.colorcombos.com/color-schemes/192/ColorCombo192.html
 from kivy.core.window import Window
-
-
+from EncryptionModule.symmetric import aes_decrypt, generate_scrypt_key
 """
 import coloredlogs, verboselogs, logging
 verboselogs.install()
 coloredlogs.install()
 logger = logging.getLogger(__name__)
 """
-def load_config():  # pylint: disable=too-many-branches
-    #app.config.update(DEFAULT_CONFIG)
 
-    with open('config.json', 'r') as f:
-        config = json.load(f)
-    return config
+store = JsonStore('config.json')
 
 class LoginPage(Screen):
-    def do_login(self, loginText, passwordText):
+    def do_login(self, passwordText):
 
             
         app = App.get_running_app()
         print (app.get_application_config())
 
-        app.username = loginText
-        logger_log.info("This is the password text %s"%passwordText)
-        app.password = hashlib.sha1(passwordText.encode("utf-8")).hexdigest()
+        
 
-
-        if app.username == "" or app.password == "":
-            Alert(title='Feynmen error message', text='username and password cannot be left blank')
+        if  app.password == "":
+            Alert(title='Error messege', text='Password cannot be left blank')
             return             
+
+        encrypted = store.get("mnemonic")
+        encrypted_mnemonic = encrypted["value"]
+        salt = encrypted["salt"]
+
+        
+        scrypt_key, salt = generate_scrypt_key(passwordText, bytes.fromhex(salt))
+        print (f"scrypt_key from password {scrypt_key.hex()} and salt is {salt.hex()}")
+
+        print (f"Encrypted Mnemonic is {encrypted_mnemonic}")
+
+        try:
+            result = aes_decrypt(scrypt_key, bytes.fromhex(encrypted_mnemonic))
+        except Exception as e:
+            print ("Error ")
+            print (e)
+            Alert(title='Error messege', text='Password entered is wrong')
+
+        
+        store.put("password", value=passwordText)
+        print (result)
+
 
         ##This iwll check if the vm has runing ipfs connection or not, 
         ##if its running global_variables.ipfs_node_id is not None
     
+        """
         try:
             r = requests.post("%slogin"%api_server, data={"username": app.username, "password": app.password, "ipfs_node_id": global_variables.ipfs_node_id})
             global_variables.app_token = r.json()["data"]["token"]
@@ -111,8 +126,9 @@ class LoginPage(Screen):
         else:
             _class.repeated_user(r.json()["data"]["user"])
 
-       ##Now we will get all the files that were stored by this user
+        ##Now we will get all the files that were stored by this user
         r = requests.get("http://localhost:8888/storage", params={"user_id": global_variables.user_id})    
+        
         self.manager.add_widget(UserPage(name='User'))
         
 
@@ -128,46 +144,60 @@ class LoginPage(Screen):
 
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'User'
+        """
+
 
     def do_registration(self):
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'UserRegistration'    
 
-    def do_forgot_password(self):
-        self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'ForgotPassword'    
+
 
     def resetForm(self):
-        self.ids['username'].text = ""
         self.ids['password'].text = ""
 
 
 class MainApp(App):
-    username = StringProperty(None)
     password = StringProperty(None)
     
     def build(self, **kwargs):
+    
         super(MainApp, self).__init__(**kwargs)
         manager = ScreenManager()
-        manager.add_widget(LoginPage(name='Login'))
-        #manager.add_widget(UserPage(name='User'))
+        manager.add_widget(UserPage(name='User'))
         manager.add_widget(UserRegistration(name='UserRegistration'))
         manager.add_widget(ForgotPassword(name='ForgotPassword'))
+        manager.add_widget(LoginPage(name='Login'))
+
         self.title = "Decentralize computation framework"
+
+        try:
+            store.get("mnemonic")
+        except:
+            #manager.transition = SlideTransition(direction="left")
+            manager.current = 'UserRegistration'
+
+        
         return manager
   
+    def on_start(self):
+        print ('App: I\'m alive!')
+ 
+    def on_stop(self):
+        print('App: Aaaargh I\'m dying!')
+
+
+from kivy import utils
 
 
 def main():
-    config = load_config()
-    print (config)
-    Config.setdefaults("dsds", config) 
 
-    #Config.set('graphics', 'width', '1000')
-    #Config.set('graphics', 'height', '600')
+    Config.set('graphics', 'width', '1000')
+    Config.set('graphics', 'height', '600')
     Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
     Config.write()
     Window.borderless = False
+    Window.clearcolor = utils.rgba("#1E1F26")
     app = MainApp()
     app.run()
 

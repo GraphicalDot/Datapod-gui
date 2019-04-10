@@ -12,7 +12,6 @@ api_server = "http://localhost:8888/"
 jwt_secret = "a"
 
 
-
 TIME_ZONE =  'Asia/Kolkata'
 
 

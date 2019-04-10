@@ -23,7 +23,20 @@ from LoggingModule.logging import logger_log
 from SettingsModule import global_variables
 import os
 import requests
+from kivy.garden.navigationdrawer import NavigationDrawer
 
+
+
+
+
+from kivy.base import runTouchApp
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.image import Image
+from kivy.uix.widget import Widget
+from kivy.core.window import Window
+from kivy.metrics import dp
 
 fake = Faker()
 
@@ -54,12 +67,20 @@ class UserPage(Screen):
         super(UserPage, self).__init__(**kwargs)
         #self.tab_1.bind(minimum_height=self.layout_content.setter('height'))
         #Clock.schedule_interval(self.update, 0)
+        """
         if self.data:
             f = MTable(self.data, cols=4)
             self.ids.tab_1.add_widget(f)
         logger_log.debug("This is the data we are looking at %s"%self.data)
         Clock.schedule_interval(self.update, 1)
+        """
+        navigationdrawer = NavigationDrawer()
 
+        side_panel = BoxLayout(orientation='vertical')
+        side_panel.add_widget(Label(text='Panel label'))
+        side_panel.add_widget(Button(text='A button'))
+        side_panel.add_widget(Button(text='Another button'))
+        navigationdrawer.add_widget(side_panel)
 
     def update(self,*args):
             self.ids.tab_1.clear_widgets()

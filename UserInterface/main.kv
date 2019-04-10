@@ -66,20 +66,6 @@
                 spacing: [10, 10]
                 padding: [10, 100, 10, 10]
                 
-
-                WrappedLabel:
-                    text: "[b][color=#382E1C]Username[/b]"
-                    markup: True
-                    valign: "middle"
-
-                FeynTextInput:
-                    id: username
-                    hint_text: "username"
-                    markup: True
-                    text:''
-                    multiline: False
-
-
                 WrappedLabel:
                     text: "[b][color=#382E1C]Password[/b]"
                 FeynTextInput:
@@ -98,11 +84,9 @@
                 WrappedButton:
                     text: "[b][color=#382E1C]Login[/b]"
                     markup: True
-                    on_press: root.do_login(username.text, password.text)
+                    on_press: root.do_login(password.text)
                 WrappedButton:
                     text: "[b][color=#382E1C]Register[/b]"
                     on_press: root.do_registration()
-                WrappedButton:
-                    text: "[b][color=#382E1C]Forgot password[/b]"
-                    on_press: root.do_forgot_password()
+                
                     

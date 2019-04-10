@@ -4,7 +4,7 @@
 from kivy.app import App
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.popup import Popup
 from kivy.uix.filechooser import FileChooser, FileChooser
 from kivy.uix.floatlayout import FloatLayout
@@ -17,14 +17,23 @@ from SettingsModule.settings import api_server
 import requests
 import re
 from LoggingModule.logging import logger_log
-
-
+from kivy.config import Config
+from kivy.storage.jsonstore import JsonStore
+import os
+import hashlib
+from EncryptionModule.symmetric import generate_scrypt_key, aes_encrypt
 
 ##THe documentation for this function which were copied are present at https://kivy.org/docs/api-kivy.uix.filechooser.html
 import os
 import sys
+from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import scrypt
 def str_to_class(str):
     return getattr(sys.modules[__name__], str)
+
+store = JsonStore('config.json')
+
+
 
 
 
@@ -32,6 +41,8 @@ class UserRegistration(Screen):
     loadfile = ObjectProperty(None)
     savefile = ObjectProperty(None)
     text_input = ObjectProperty(None)
+    mnemonic = StringProperty()
+    address = StringProperty()
     file = 'enter zip path or select it'
     
     def open(self, textfield_id):
@@ -64,17 +75,61 @@ class UserRegistration(Screen):
         f.text = self.file
         self.popup.dismiss()
 
+    def on_save(self, passphrase, repeat_passphrase):
+        # if store.get("mnemonic"):
+        #     print ("Mnemonic exists")
+        #     print (store.get("mnemonic"))
+        #     return 
+
+
+        if passphrase.text != repeat_passphrase.text or not passphrase.text:
+            Alert(title='Error message', text='Passphrases must match')
+            return  
+
+        if len(passphrase.text) <  8:
+            Alert(title='Error message', text='Passphrases must be at least 8 characters long')
+            return  
+
+        if not self.mnemonic:
+            Alert(title='Error message', text='PLease generate a New mnemonic')
+            return 
+
+
+        scrypt_key, salt = generate_scrypt_key(passphrase.text)
+        encrypted_mnemonic = aes_encrypt(scrypt_key, self.mnemonic)
+
+        store.put("mnemonic", value=encrypted_mnemonic.hex(), salt=salt.hex())
+
+        print (store.get("mnemonic"))
+
+        self.go_to_login()
+        return
+
     def on_submit(self):
         """
         Make an api request with the data to confirm the user registraion
-        After succeful registration reset the form 
+        After succesful registration reset the form 
         """
         #TODO form validation with cerberus
         #TODO Check if macid is available from the host or not
         #TODO check if ip address
+        app = App.get_running_app()
+        print (app.get_application_config())
+        print (app.config)
 
-        text = App.get_running_app().config
-        print (text)
+        r = requests.get(f"http://{store.get('GO_API')}/get_mnemonic")
+        mnemonic = r.json()["data"]["mnemonic"]
+        zeroth_private_key = r.json()["data"]["zeroth_private_key"]
+        zeroth_public_key = r.json()["data"]["zeroth_public_key"]
+
+
+        master_private_key = r.json()["data"]["master_private_key"]
+        master_public_key = r.json()["data"]["master_public_key"]
+
+
+
+        self.mnemonic = mnemonic 
+        self.address = hashlib.sha256(zeroth_public_key.encode()).hexdigest()
 
         """
         print (username, password, repeat_password, email, phone_number)

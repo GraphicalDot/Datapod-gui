@@ -1,22 +1,102 @@
 #:kivy 1.10.0
+#:import hex kivy.utils.get_color_from_hex
+
+<CustButton@Button>:
+    color: hex("#F25C00")
+    font_size: 15
+    background_color: hex("#2D4262")
 
 
+<CustLabel@Label>:
+    markup: True
+    color: hex("#F25C00")
+   
 
 <UserRegistration>:
     BoxLayout:
+
         orientation: "vertical"
-        
-        BoxLayout:
-            size_hint_y: 0.2
-            padding: [10, 10, 10, 10]
-            orientation: "horizontal"
-            Label:
-                text: "Username"
-            TextInput:
-                id: username
-                hint_text: "username"
-                text:''
-                multiline: False
+        GridLayout:
+            orientation: "vertical"
+            cols: 1
+            BoxLayout:
+                size_hint_y: 0.2
+                padding: [10, 10, 10, 10]
+
+                orientation: "horizontal"
+                CustLabel:
+                    text: '[b]Mnemonic[/b]'
+                    size_hint: 1, 0.5
+                
+                CustLabel:
+                    id: mnemonic
+                    text: root.mnemonic
+                    text_size: self.width, None
+
+            BoxLayout:
+                size_hint_y: 0.2
+                padding: [10, 10, 10, 10]
+
+                orientation: "horizontal"
+                CustLabel:
+                    text: '[b]Address[/b]'
+                    size_hint: 1, 0.5
+                
+                CustLabel:
+                    id: address
+                    text: root.address
+                    text_size: self.width, None
+            
+            BoxLayout:
+                size_hint_y: None
+                height: 50
+                padding: [10, 10, 10, 10]
+
+                orientation: "horizontal"
+                CustLabel:
+                    text: '[b]Enter passphrase[/b]'
+                TextInput:
+                    id: passphrase
+                    #size_hint_y: None
+                    #height: 50
+                    hint_text: "Enter passphrase to encrypt your mnemonic"
+                    password: True
+                    text:''
+                    multiline: False
+                
+            BoxLayout:
+                size_hint_y: None
+                height: 50
+                padding: [10, 10, 10, 10]
+                CustLabel:
+                    text: '[b]Repeat passphrase[/b]'
+                TextInput:
+                    id: repeat_passphrase
+                    hint_text: "Repeat passphrase to encrypt your mnemonic"
+                    password: True
+                    text:''
+                    multiline: False
+
+
+
+            BoxLayout:
+                orientation: "horizontal"
+                padding: 10,10,10,10
+                spacing: 10
+                size_hint_y: 0.05
+            
+                CustButton:
+                    on_press: root.on_submit()
+                    text: "Generate Mnemonic"
+                CustButton:
+                    text: "Cancel"
+                    on_press: root.on_cancel()
+
+                CustButton:
+                    text: "Save"
+                    on_press: root.on_save(passphrase, repeat_passphrase)
+
+
 
         #BoxLayout:
         #    size_hint_y: 0.2
@@ -133,16 +213,5 @@
 
 
 
-        BoxLayout:
-            orientation: "horizontal"
-            padding: 10,10,10,10
-            spacing: 10
-            size_hint_y: 0.05
         
-            Button:
-                on_press: root.on_submit()
-                text: "Generate Mnemonic"
-            Button:
-                text: "Cancel"
-                on_press: root.on_cancel()
 
