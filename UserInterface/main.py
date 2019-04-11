@@ -13,7 +13,6 @@ from kivy.properties import StringProperty
 from kivy.clock import Clock
 import time
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
-from Application.userpage import UserPage
 from user_registration import UserRegistration
 from forgot_password import ForgotPassword
 from kivy.storage.jsonstore import JsonStore
@@ -31,6 +30,8 @@ from LoggingModule.logging import logger_log
 #https://www.colorcombos.com/color-schemes/192/ColorCombo192.html
 from kivy.core.window import Window
 from EncryptionModule.symmetric import aes_decrypt, generate_scrypt_key
+
+from latest import KitchenSink
 """
 import coloredlogs, verboselogs, logging
 verboselogs.install()
@@ -164,7 +165,7 @@ class MainApp(App):
     
         super(MainApp, self).__init__(**kwargs)
         manager = ScreenManager()
-        manager.add_widget(UserPage(name='User'))
+        manager.add_widget(KitchenSink(name='User'))
         manager.add_widget(UserRegistration(name='UserRegistration'))
         manager.add_widget(ForgotPassword(name='ForgotPassword'))
         manager.add_widget(LoginPage(name='Login'))

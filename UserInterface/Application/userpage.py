@@ -28,7 +28,6 @@ from kivy.garden.navigationdrawer import NavigationDrawer
 
 
 
-
 from kivy.base import runTouchApp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -37,6 +36,13 @@ from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from kivy.metrics import dp
+from kivy.app import App
+from kivy.lang import Builder
+
+from kivymd.navigationdrawer import NavigationDrawerIconButton
+from kivymd.theming import ThemeManager
+from kivymd.toast import toast
+
 
 fake = Faker()
 
@@ -74,13 +80,14 @@ class UserPage(Screen):
         logger_log.debug("This is the data we are looking at %s"%self.data)
         Clock.schedule_interval(self.update, 1)
         """
-        navigationdrawer = NavigationDrawer()
 
-        side_panel = BoxLayout(orientation='vertical')
-        side_panel.add_widget(Label(text='Panel label'))
-        side_panel.add_widget(Button(text='A button'))
-        side_panel.add_widget(Button(text='Another button'))
-        navigationdrawer.add_widget(side_panel)
+    def on_start(self):
+        for i in range(15):
+            self.main_widget.ids.nav_drawer.add_widget(
+                NavigationDrawerIconButton(
+                    icon='checkbox-blank-circle', text="Item menu %d" % i,
+                    on_release=lambda x, y=i: self.callback(x, y)))
+
 
     def update(self,*args):
             self.ids.tab_1.clear_widgets()
@@ -96,65 +103,7 @@ class UserPage(Screen):
 
         self.go_to_login()
     
-    def add(self, *args):
-        self.ids['VIEWlist'].adapter.data.append('txt')
 
-
-    def go_to_login(self):
-        self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'Login'
-        self.manager.get_screen('Login').resetForm()
-        return  
-
-    def open(self, textfield_id):
-        self.popup = Popup(title='Test popup',
-                  content=self.explorer(),
-                   background = 'atlas://data/images/defaulttheme/button_pressed',
-                  size_hint=(None, None), size=(1000, 600))
-        self.popup.open()
-        self.textid = textfield_id
-    
-    def explorer(self):
-        if platform == 'win':
-            user_path = dirname(expanduser('~'))
-        else:
-            user_path = expanduser('~') 
-        browser = FileBrowser(select_string='Select',
-                          favorites=[(user_path, 'Documents')])
-        browser.bind(
-                on_success=self._fbrowser_success,
-                on_canceled=self._fbrowser_canceled)
-        return browser
-
-    def _fbrowser_canceled(self, instance):
-        print ('cancelled, Close self.')
-        self.popup.dismiss()
-
-    def _fbrowser_success(self, instance):
-        print(instance.selection[0])
-        self.file = instance.selection[0]
-
-        f = self.ids[self.textid]
-        f.text = self.file
-        logger_log.debug("This is the dile name %s"%f.text)
-        self.popup.dismiss()
-
-    def save_on_filesystem(self):
-        f = self.ids[self.textid]
-        file_path = f.text
-
-        file_size = os.path.getsize(file_path)
-        file_name = os.path.basename(file_path)
-    
-        filesystem = IPFS()
-        filesystem.store_data(file_path, file_name, file_size)
-        
-        ##Instead use some key value database pair
-        r = requests.get("http://localhost:8888/storage", params={"user_id": global_variables.user_id})    
-        logger_log.debug(r.json()["data"])
-        self.data = r.json()["data"]
-
-        self.update()
 
 if __name__== "__main__":
     pass

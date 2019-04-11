@@ -4,3 +4,4 @@ bin/
 share/
 __pycache__/
 include/*
+*.data
