@@ -24,7 +24,7 @@ from kivy.storage.jsonstore import JsonStore
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.factory import Factory
 from EncryptionModule.symmetric import generate_scrypt_key, aes_encrypt, aes_decrypt
-from instagram_api import instagram_login, get_all_posts
+from instagram_api import instagram_login, get_all_posts, save_instagram
 from kivy.properties import ObjectProperty, ListProperty, StringProperty
 
 
@@ -38,17 +38,7 @@ import datetime
 store = JsonStore('config.json')
 
 
-def download_instagram_thumbnails(instagram_file_data):
-    try:
-        with open("instagram.data", "rb") as f:
-            posts = pickle.load(f)
-    except Exception as e:
-        print (f"Error loading instagram data with pickle {e.__str__()}")
 
-    for post in posts:
-        for image in post["image_versions2"]["candidates"]:
-            if image["width"] == 240:
-                print (image)
 
 
 
@@ -261,9 +251,12 @@ class MainApp(App):
         try:
             instagram_object = instagram_login(username.text, password.text)
             max_id, posts = get_all_posts(instagram_object)
-            print (posts)
-            with open("instagram.data","wb") as f:
-                pickle.dump(posts, f)
+
+            
+            
+            save_instagram(posts)
+            # with open("instagram.data","wb") as f:
+            #     pickle.dump(posts, f)
             store.put("instagram", max_id=max_id, time_zone=time.tzname, 
                 last_fetch_utc=datetime.datetime.utcnow().timestamp(),
                 last_fetch_local=datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()

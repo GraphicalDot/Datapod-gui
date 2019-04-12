@@ -36,6 +36,12 @@
 #:import MDList kivymd.list.MDList
 
 
+<Spinner@MDSpinner>:
+    id: spinner
+    size_hint: None, None
+    size: dp(46), dp(46)
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
 
 <FirstContent@GridLayout>:
     title: "Instagram"
@@ -116,7 +122,7 @@ NavigationLayout:
             Screen:
                 name: 'datapis'
                 MDBottomNavigation:
-                    id: bottom_navigation_demo
+                    id: old_bottom_navigation_demo
                     
                     MDBottomNavigationItem:
                         name: 'instagram'
@@ -416,7 +422,7 @@ NavigationLayout:
             Screen:
                 name: 'bottom_navigation'
                 MDBottomNavigation:
-                    id: bottom_navigation_demo
+                    id: old_bottom_navigation_demo
                     MDBottomNavigationItem:
                         name: 'octagon'
                         text: "Warning"
