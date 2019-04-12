@@ -38,6 +38,19 @@ import datetime
 store = JsonStore('config.json')
 
 
+def download_instagram_thumbnails(instagram_file_data):
+    try:
+        with open("instagram.data", "rb") as f:
+            posts = pickle.load(f)
+    except Exception as e:
+        print (f"Error loading instagram data with pickle {e.__str__()}")
+
+    for post in posts:
+        for image in post["image_versions2"]["candidates"]:
+            if image["width"] == 240:
+                print (image)
+
+
 
 class HackedDemoNavDrawer(MDNavigationDrawer):
     # DO NOT USE
@@ -66,7 +79,7 @@ class MainApp(App):
     repeat_passphrase = StringProperty()    
     enabled_mnemonic = BooleanProperty(True)
     enabled_address = BooleanProperty(True)
-    
+    instagram_last_fetched = StringProperty()
 
     def __init__(self, **kwargs):
         super(MainApp, self).__init__(**kwargs)
@@ -94,6 +107,13 @@ class MainApp(App):
         #     on_text_validate=self.set_error_message,
         #     on_focus=self.set_error_message)
         self.bottom_navigation_remove_mobile(self.main_widget)
+        #__list = Factory.Lists()
+        for i in range(10):
+            self.main_widget.ids.scroll.add_widget(
+                Factory.ThreeLineAvatarIconListItemCheckbox(text='Item %d' % i))
+
+        self.instagram_last_fetched = "Last Fetched from Instagram " + self.instagram_last()
+
         return self.main_widget
 
     def bottom_navigation_remove_mobile(self, widget):
@@ -238,13 +258,6 @@ class MainApp(App):
         return 
 
     def on_instagram_login(self, username, password):
-        __list = Factory.Lists()
-        for i in range(30):
-            __list.ids.scroll.add_widget(
-                Factory.ListItemWithCheckbox(text='Item %d' % i))
-        return 
-
-        """
         try:
             instagram_object = instagram_login(username.text, password.text)
             max_id, posts = get_all_posts(instagram_object)
@@ -252,14 +265,27 @@ class MainApp(App):
             with open("instagram.data","wb") as f:
                 pickle.dump(posts, f)
             store.put("instagram", max_id=max_id, time_zone=time.tzname, 
-                last_fetch_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                last_fetch_utc=datetime.datetime.utcnow().timestamp(),
                 last_fetch_local=datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
                  )
         except:
             Snackbar(text="Please check your instragram username and password again").show()
-        """
-        return 
+        return
         
+    def instagram_last(self):
+            try:
+                data = store.get("instagram")
+                print (f"Instagram data stored in local storage {data}")
+                print (f"Instagram Last fectehd locally is {data['last_fetch_local']}")
+
+                result = datetime.datetime.fromtimestamp(data["last_fetch_utc"]).strftime("%d %B, %Y")
+                print (f"Human readable last fecthed {result}")
+                return result
+            except Exception as e:
+                print (f"Error in lest fecthed dtiem stamp UTC {e.__str__()}")
+                return ""
+
+
 
 
     def on_show_mnemonic(self):

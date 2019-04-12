@@ -14,6 +14,7 @@
 #:import OneLineAvatarListItem kivymd.list.OneLineAvatarListItem
 #:import OneLineIconListItem kivymd.list.OneLineIconListItem
 #:import OneLineAvatarIconListItem kivymd.list.OneLineAvatarIconListItem
+#:import OneLineAvatarIconListItem kivymd.list.ThreeLineAvatarIconListItem
 #:import MDTextField kivymd.textfields.MDTextField
 #:import MDSpinner kivymd.spinner.MDSpinner
 #:import MDCard kivymd.card.MDCard
@@ -32,7 +33,6 @@
 #:import MDThemePicker kivymd.theme_picker.MDThemePicker
 #:import MDBottomNavigation kivymd.tabs.MDBottomNavigation
 #:import MDBottomNavigationItem kivymd.tabs.MDBottomNavigationItem
-#:import OneLineAvatarIconListItem kivymd.list.OneLineAvatarIconListItem
 #:import MDList kivymd.list.MDList
 
 
@@ -47,9 +47,19 @@
 
 
 <ListItemWithCheckbox@OneLineAvatarIconListItem>:
-    MyAvatar:
-        source: 'logo.png'
-    MyCheckbox:
+    text: "Single-line + avatar&icon"
+    AvatarSampleWidget:
+        source: './assets/avatar.png'
+    IconRightSampleWidget:
+    MDCheckbox:
+
+
+<ThreeLineAvatarIconListItemCheckbox@ThreeLineAvatarIconListItem>:
+    text: "Three-line item..."
+    secondary_text: "...with avatar&icon..." + '\\n' + "and third line!"
+    AvatarSampleWidget:
+        source: './assets/avatar.png'
+    IconRightSampleWidget:   
 
 <ContentNavigationDrawer@MDNavigationDrawer>:
     drawer_logo: 'assets/profile.jpg'
@@ -107,36 +117,51 @@ NavigationLayout:
                 name: 'datapis'
                 MDBottomNavigation:
                     id: bottom_navigation_demo
-                    ScrollView:
-                        MDList:
-                            id: scroll
+                    
                     MDBottomNavigationItem:
                         name: 'instagram'
                         text: "Instagram"
                         icon: 'bank'
-                        BoxLayout:
-                            orientation: 'vertical'
-                            size_hint_y: None
-                            padding: dp(48)
-                            spacing: 10
-                            MDTextField:
-                                id: instagram_username
-                                hint_text: "Instagram username"
-                                helper_text: "Put your instragram username here"
-                                helper_text_mode: "on_focus"
-                            
-                            MDTextField:
-                                id: instagram_password
-                                hint_text: "Instagram password"
-                                helper_text: "Put your instrgram password here"
-                                helper_text_mode: "on_focus"
-                            MDRaisedButton:
-                                text: "Login"
-                                opposite_colors: True
-                                size_hint: None, None
-                                size: 4 * dp(48), dp(48)
-                                pos_hint: {'center_x': 0.5, 'center_y': 0.6}
-                                on_release: app.on_instagram_login(instagram_username, instagram_password)
+                        GridLayout:
+                            cols: 2
+                            ScrollView:
+                                MDList:
+                                    id: scroll
+                                    padding: dp(48)
+                                    spacing: 10
+
+                                    
+
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint_y: None
+                                padding: dp(48)
+                                spacing: 10
+                                MDLabel:
+                                    id: instagram_last_fetched
+                                    text: app.instagram_last_fetched
+                                    theme_text_color: 'Primary'
+                                MDTextField:
+                                    id: instagram_username
+                                    hint_text: "Instagram username"
+                                    helper_text: "Put your instragram username here"
+                                    helper_text_mode: "on_focus"
+                                
+                                MDTextField:
+                                    id: instagram_password
+                                    hint_text: "Instagram password"
+                                    helper_text: "Put your instrgram password here"
+                                    helper_text_mode: "on_focus"
+                                    password: True
+
+                                MDRaisedButton:
+                                    text: "Login"
+                                    opposite_colors: True
+                                    size_hint: None, None
+                                    size: 4 * dp(48), dp(48)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+                                    on_release: app.on_instagram_login(instagram_username, instagram_password)
 
 
                     MDBottomNavigationItem:

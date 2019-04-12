@@ -31,7 +31,6 @@ from LoggingModule.logging import logger_log
 from kivy.core.window import Window
 from EncryptionModule.symmetric import aes_decrypt, generate_scrypt_key
 
-from latest import KitchenSink
 """
 import coloredlogs, verboselogs, logging
 verboselogs.install()
@@ -165,7 +164,6 @@ class MainApp(App):
     
         super(MainApp, self).__init__(**kwargs)
         manager = ScreenManager()
-        manager.add_widget(KitchenSink(name='User'))
         manager.add_widget(UserRegistration(name='UserRegistration'))
         manager.add_widget(ForgotPassword(name='ForgotPassword'))
         manager.add_widget(LoginPage(name='Login'))
