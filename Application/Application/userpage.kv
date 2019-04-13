@@ -1,0 +1,181 @@
+#:import ListItemButton kivy.uix.listview.ListItemButton
+#:import ListAdapter kivy.adapters.listadapter.ListAdapter
+#:import DictAdapter kivy.adapters.dictadapter
+#:import CompositeListItem kivy.uix.listview
+#:import SelectableView kivy.uix.listview
+#:import TabbedPanel kivy.uix.tabbedpanel 
+#:import TabbedPanelItem kivy.uix.tabbedpanel 
+#:import hex kivy.utils.get_color_from_hex
+#Reference userpage.py
+
+
+
+<WrappedButton@Button>:
+    markup: True
+    background_normal: ''
+    background_color: hex("#C0A172")
+    size_hint_y: (root.width)/10
+
+
+
+<WrappedLabel@Label>:
+    markup: True
+    
+
+
+<UserPage>:
+    
+    size_hint: 1, 1
+
+    TabbedPanel:
+        do_default_tab: False
+        tab_width: self.size[0]/len(self.tab_list)
+        TabbedPanelItem:
+            background_color: hex("#356141")
+            text: 'Key/Pairs'
+            GridLayout:
+                orientation: "vertical"
+                cols: 1
+                BoxLayout:
+                    size_hint_y: 0.2
+                    padding: [10, 10, 10, 10]
+
+                    orientation: "horizontal"
+                    Label:
+                        text: '[b][color=#3d7f4c]Filesystem Node ID[/b]'
+                        markup: True
+                        size_hint: 1, 0.5
+                    
+                    Label:
+                        id: ipfs_node_id
+                        text: root.ipfs_node_id
+                        text_size: self.width, None
+                BoxLayout:
+                    size_hint_y: 0.2
+                    padding: [10, 10, 10, 10]
+
+                    orientation: "horizontal"
+                    Label:
+                        text: '[b][color=#3d7f4c]Your passphrase[/b]'
+                        markup: True
+                        size_hint: 1, 0.5
+                    
+                    Label:
+                        id: ipfs_node_id
+                        text: root.passphrase
+                        text_size: self.width, None
+
+                BoxLayout:
+                    size_hint_y: 0.2
+                    padding: [10, 10, 10, 10]
+
+                    orientation: "horizontal"
+                    Label:
+                        text: '[b][color=#3d7f4c]Encryption Public Key[/b]'
+                        markup: True
+                        size_hint: 1, 0.5
+                    
+                    Label:
+                        id: encryption_public_key
+                        text: root.encryption_public_key
+                        text_size: self.width, None
+
+
+
+
+        TabbedPanelItem:
+            background_color: hex("#356141")
+            text: 'Store Content'
+            BoxLayout:
+                orientation: "vertical"
+                spacing: 10, 10
+                padding: [5, 5, 5, 5]
+                GridLayout:
+                    cols: 3
+                    orientation: "vertical"
+                    size_hint_y: 0.2
+                    padding: [10, 10, 10, 10]
+
+                    orientation: "horizontal"
+                    Label:
+                        text: "File to be stored"
+                    Label:
+                        id: ipfs_file_location
+                        text: root.file
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                    BoxLayout:
+                        orientation: "vertical"
+                        padding: [10, 10, 10, 10]
+                        Button:
+                            text: 'Load'
+                            size_hint: 1, 0.5
+                            on_press: root.open("ipfs_file_location")
+                    
+                        Button:
+                            text: 'save'
+                            size_hint: 1, 0.5
+                            on_press: root.save_on_filesystem()
+
+                BoxLayout:
+                    canvas:
+                        Color:
+                            rgb: 0, 0, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    ScrollView:
+                        # setting the width of the scrollbar to 50pixels
+                        bar_width: 50
+                        # setting the color of the active bar using rgba
+                        bar_color: 5, 10, 15, .8
+                        # setting the color of the inactive bar using rgba
+                        bar_inactive_color: 5, 20, 10, .5
+                        # setting the content only to scroll via bar, not content
+                        scroll_type: ['bars']
+                        bar_width: 4
+                        id: tab_1
+        TabbedPanelItem:
+            background_color: hex("#356141")
+            text: 'Jobs'
+            BoxLayout:
+                Label:
+                    text: 'Second tab content area'
+                Button:
+                    text: 'Button that does nothing'
+
+        TabbedPanelItem:
+            background_color: hex("#356141")
+            text: 'Add & Transfer Assets'
+            RstDocument:
+                text:
+                    '\n'.join(("Transfer asset Tab", "-----------",
+                    "Here the user will create the asset from the file stored on IPFS .", 
+                    "and then transfer these assets to the Users present on BIGchainDB"))
+
+        TabbedPanelItem:
+            background_color: hex("#356141")
+            text: 'Resources'
+            RstDocument:
+                text:
+                    '\n'.join(("Resources Tab", "-----------",
+                    "Here the user can dynamically change the resources allocated to the virtual machine"))
+
+        TabbedPanelItem:
+            background_color: hex("#356141")
+            text: 'Smart contracts'
+            RstDocument:
+                text:
+                    '\n'.join(("Smart Contracts Tab", "-----------",
+                    "\n", "Here the user can float smart contracts on Ethereum private blockchain to train their machine learning models", 
+                    "\n", "The user can set preferences for the node show should be selected to participate based on their past history", 
+                    "\n", "After successful execution of the contract, A user can also store this machine learning model on IPFS and ", 
+                    "\n", "Float a smart contract for other users to use this Machine learning model in liue of tokens.  ", 
+                    
+                    ))
+
+
+
+
+
+

@@ -1,0 +1,557 @@
+#:import Toolbar kivymd.toolbar.Toolbar
+#:import ThemeManager kivymd.theming.ThemeManager
+#:import MDNavigationDrawer kivymd.navigationdrawer.MDNavigationDrawer
+#:import NavigationLayout kivymd.navigationdrawer.NavigationLayout
+#:import NavigationDrawerDivider kivymd.navigationdrawer.NavigationDrawerDivider
+#:import NavigationDrawerToolbar kivymd.navigationdrawer.NavigationDrawerToolbar
+#:import NavigationDrawerSubheader kivymd.navigationdrawer.NavigationDrawerSubheader
+#:import MDCheckbox kivymd.selectioncontrols.MDCheckbox
+#:import MDSwitch kivymd.selectioncontrols.MDSwitch
+#:import MDList kivymd.list.MDList
+#:import OneLineListItem kivymd.list.OneLineListItem
+#:import TwoLineListItem kivymd.list.TwoLineListItem
+#:import ThreeLineListItem kivymd.list.ThreeLineListItem
+#:import OneLineAvatarListItem kivymd.list.OneLineAvatarListItem
+#:import OneLineIconListItem kivymd.list.OneLineIconListItem
+#:import OneLineAvatarIconListItem kivymd.list.OneLineAvatarIconListItem
+#:import OneLineAvatarIconListItem kivymd.list.ThreeLineAvatarIconListItem
+#:import MDTextField kivymd.textfields.MDTextField
+#:import MDSpinner kivymd.spinner.MDSpinner
+#:import MDCard kivymd.card.MDCard
+#:import MDSeparator kivymd.card.MDSeparator
+#:import MDDropdownMenu kivymd.menu.MDDropdownMenu
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+#:import colors kivymd.color_definitions.colors
+#:import SmartTile kivymd.grid.SmartTile
+#:import MDSlider kivymd.slider.MDSlider
+#:import MDTabbedPanel kivymd.tabs.MDTabbedPanel
+#:import MDTab kivymd.tabs.MDTab
+#:import MDProgressBar kivymd.progressbar.MDProgressBar
+#:import MDAccordion kivymd.accordion.MDAccordion
+#:import MDAccordionItem kivymd.accordion.MDAccordionItem
+#:import MDAccordionSubItem kivymd.accordion.MDAccordionSubItem
+#:import MDThemePicker kivymd.theme_picker.MDThemePicker
+#:import MDBottomNavigation kivymd.tabs.MDBottomNavigation
+#:import MDBottomNavigationItem kivymd.tabs.MDBottomNavigationItem
+#:import MDList kivymd.list.MDList
+
+
+<Spinner@MDSpinner>:
+    id: spinner
+    size_hint: None, None
+    size: dp(46), dp(46)
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+
+<FirstContent@GridLayout>:
+    title: "Instagram"
+    cols: 1
+    BoxLayout:
+        Button:
+            text: 'Click me'
+            on_press: self.change_content()
+
+
+
+<ThreeLineAvatarIconListItemCheckbox@ThreeLineAvatarIconListItem>:
+    text: "Three-line item..."
+    secondary_text: "...with avatar&icon..." + '\\n' + "and third line!"
+    AvatarSampleWidget:
+        source: './assets/avatar.png'
+    IconRightSampleWidget:   
+
+<ContentNavigationDrawer@MDNavigationDrawer>:
+    drawer_logo: 'assets/profile.jpg'
+
+NavigationLayout:
+    id: nav_layout
+    ContentNavigationDrawer:
+        id: nav_drawer
+        NavigationDrawerToolbar:
+            title: "Navigation Drawer"
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Accordion"
+            on_release: app.root.ids.scr_mngr.current = 'accordion'
+
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Login"
+            on_release: app.root.ids.scr_mngr.current = 'login'
+
+
+
+
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Data Platforms"
+            on_release: app.root.ids.scr_mngr.current = 'datapis'
+
+
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Data Storage"
+            on_release: app.root.ids.scr_mngr.current = 'datastorage'
+        
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Bottom Navigation"
+            on_release: app.root.ids.scr_mngr.current = 'bottom_navigation'
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Bottom Sheets"
+            on_release: app.root.ids.scr_mngr.current = 'bottomsheet'
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Buttons"
+            on_release: app.root.ids.scr_mngr.current = 'button'
+       
+    BoxLayout:
+        orientation: 'vertical'
+        Toolbar:
+            id: toolbar
+            md_bg_color: app.theme_cls.primary_color
+            background_palette: 'Primary'
+            background_hue: '100'
+            left_action_items: [['menu', lambda x: app.root.toggle_nav_drawer()]]
+            right_action_items: [['close', lambda x: app.on_close()]]
+        ScreenManager:
+            id: scr_mngr
+
+
+            Screen:
+                name: 'datastorage'
+                MDBottomNavigation:
+                    id: datastorage_navigation
+                    
+                    MDBottomNavigationItem:
+                        name: 'IPFS'
+                        text: "IPFS"
+                        icon: 'file'
+                        GridLayout:
+                            cols: 2
+                            ScrollView:
+                                MDList:
+                                    id: scroll
+                                    padding: dp(48)
+                                    spacing: 10
+
+                                    
+
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint_y: None
+                                padding: dp(48)
+                                spacing: 10
+                                MDLabel:
+                                    id: instagram_last_fetched
+                                    text: app.instagram_last_fetched
+                                    theme_text_color: 'Primary'
+                                MDTextField:
+                                    id: instagram_username
+                                    hint_text: "Instagram username"
+                                    helper_text: "Put your instragram username here"
+                                    helper_text_mode: "on_focus"
+                                
+                                MDTextField:
+                                    id: instagram_password
+                                    hint_text: "Instagram password"
+                                    helper_text: "Put your instrgram password here"
+                                    helper_text_mode: "on_focus"
+                                    password: True
+
+                                MDRaisedButton:
+                                    text: "Login"
+                                    opposite_colors: True
+                                    size_hint: None, None
+                                    size: 4 * dp(48), dp(48)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+                                    on_release: app.on_instagram_login(instagram_username, instagram_password)
+
+
+                    MDBottomNavigationItem:
+                        name: 'amazon_s3'
+                        text: "Amazon S3"
+                        icon: 'cloud-circle'
+                        id: amazon_s3_navigation
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_y: None
+                            padding: dp(48)
+                            spacing: 10
+                            MDTextField:
+                                hint_text: "Hello again"
+                    MDBottomNavigationItem:
+                        name: 'google-storage'
+                        text: "Google Storage"
+                        icon: 'cloud'
+                        id: bottom_navigation_desktop_2
+                        MDLabel:
+                            font_style: 'Body1'
+                            theme_text_color: 'Primary'
+                            text: "Coming soon!!"
+                            halign: 'center'
+                
+                
+
+
+            Screen:
+                name: 'datapis'
+                MDBottomNavigation:
+                    id: old_bottom_navigation_demo
+                    
+                    MDBottomNavigationItem:
+                        name: 'instagram'
+                        text: "Instagram"
+                        icon: 'instagram'
+                        GridLayout:
+                            cols: 2
+                            ScrollView:
+                                MDList:
+                                    id: scroll
+                                    padding: dp(48)
+                                    spacing: 10
+
+                                    
+
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint_y: None
+                                padding: dp(48)
+                                spacing: 10
+                                MDLabel:
+                                    id: instagram_last_fetched
+                                    text: app.instagram_last_fetched
+                                    theme_text_color: 'Primary'
+                                MDTextField:
+                                    id: instagram_username
+                                    hint_text: "Instagram username"
+                                    helper_text: "Put your instragram username here"
+                                    helper_text_mode: "on_focus"
+                                
+                                MDTextField:
+                                    id: instagram_password
+                                    hint_text: "Instagram password"
+                                    helper_text: "Put your instrgram password here"
+                                    helper_text_mode: "on_focus"
+                                    password: True
+
+                                MDRaisedButton:
+                                    text: "Login"
+                                    opposite_colors: True
+                                    size_hint: None, None
+                                    size: 4 * dp(48), dp(48)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+                                    on_release: app.on_instagram_login(instagram_username, instagram_password)
+
+
+                    MDBottomNavigationItem:
+                        name: 'bottom_navigation_desktop_1'
+                        text: "Whatsapp"
+                        icon: 'whatsapp'
+                        id: bottom_navigation_desktop_1
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_y: None
+                            padding: dp(48)
+                            spacing: 10
+                            MDTextField:
+                                hint_text: "Hello again"
+                    MDBottomNavigationItem:
+                        name: 'bottom_navigation_desktop_2'
+                        text: "Twitter"
+                        icon: 'twitter'
+                        id: bottom_navigation_desktop_2
+                        MDLabel:
+                            font_style: 'Body1'
+                            theme_text_color: 'Primary'
+                            text: "Coming soon!!"
+                            halign: 'center'
+                
+                    MDBottomNavigationItem:
+                        name: 'bottom_navigation_desktop_2'
+                        text: "Facebook"
+                        icon: 'facebook'
+                        id: bottom_navigation_desktop_2
+                        MDLabel:
+                            font_style: 'Body1'
+                            theme_text_color: 'Primary'
+                            text: "Coming soon!!"
+                            halign: 'center'
+
+            Screen:
+                name: 'bottomsheet'
+                MDRaisedButton:
+                    text: "Open list bottom sheet"
+                    opposite_colors: True
+                    size_hint: None, None
+                    size: 4 * dp(48), dp(48)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+                    on_release: app.show_example_bottom_sheet()
+                MDRaisedButton:
+                    text: "Open grid bottom sheet"
+                    opposite_colors: True
+                    size_hint: None, None
+                    size: 4 * dp(48), dp(48)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+                    on_release: app.show_example_grid_bottom_sheet()
+            Screen:
+                name: 'button'
+                BoxLayout:
+                    size_hint: None, None
+                    size: '88dp', '48dp'
+                    padding: '12dp'
+                    pos_hint: {'center_x': 0.75, 'center_y': 0.8}
+                    MDLabel:
+                        font_style: 'Body1'
+                        theme_text_color: 'Primary'
+                        text: "Disable buttons"
+                        size_hint_x:None
+                        width: '56dp'
+                    MDCheckbox:
+                        id: disable_the_buttons
+                MDIconButton:
+                    icon: 'sd'
+                    pos_hint: {'center_x': 0.25, 'center_y': 0.8}
+                    disabled: disable_the_buttons.active
+                MDFlatButton:
+                    text: 'MDFlatButton'
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+                    disabled: disable_the_buttons.active
+                MDRaisedButton:
+                    text: "MDRaisedButton"
+                    elevation_normal: 2
+                    opposite_colors: True
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+                    disabled: disable_the_buttons.active
+                MDFloatingActionButton:
+                    id:                    float_act_btn
+                    icon:                'plus'
+                    opposite_colors:    True
+                    elevation_normal:    8
+                    pos_hint:            {'center_x': 0.5, 'center_y': 0.2}
+                    disabled: disable_the_buttons.active
+           
+
+            Screen:
+                name: 'snackbar'
+                MDRaisedButton:
+                    text: "Create simple snackbar"
+                    size_hint: None, None
+                    size: 4 * dp(48), dp(48)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.75}
+                    opposite_colors: True
+                    on_release: app.show_example_snackbar('simple')
+                MDRaisedButton:
+                    text: "Create snackbar with button"
+                    size_hint: None, None
+                    size: 4 * dp(48), dp(48)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    opposite_colors: True
+                    on_release: app.show_example_snackbar('button')
+                MDRaisedButton:
+                    text: "Create snackbar with a lot of text"
+                    size_hint: None, None
+                    size: 5 * dp(48), dp(48)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.25}
+                    opposite_colors: True
+                    on_release: app.show_example_snackbar('verylong')
+
+            Screen:
+                name: 'login'
+                ScrollView:
+                    BoxLayout:
+                        orientation: 'vertical'
+                        id: login_box
+                        size_hint_y: None
+                        height: self.minimum_height
+                        padding: dp(48)
+                        spacing: 10
+                        
+                        MDTextField:
+                            hint_text: "24 word mnemonic"
+                            id: mnemonic
+                            multiline: True
+                            text: app.mnemonic
+                            disabled: app.enabled_mnemonic
+                            required: True
+
+                        MDTextField:
+                            multiline: True
+                            hint_text: "Blockchain Address"
+                            id: address
+                            text: app.address
+                            helper_text_mode: "on_focus"
+                            disabled: app.enabled_address
+                            required: True
+
+                        MDTextField:
+                            #id: text_field_error
+                            id: passphrase
+                            text: app.passphrase
+                            hint_text: "Passphrase"
+                            helper_text: "Passphrase to encrypt your password"
+                            required: True
+
+                        MDTextField:
+                            text: app.repeat_passphrase
+                            id: repeat_passphrase
+                            hint_text: "Repeat passphrase"
+                            helper_text: "Passphrase to encrypt your password"
+                            required: True
+
+                        # MDTextField:
+                        #     id: text_field_error
+                        #     hint_text: "Helper text on error (Hit Enter with two characters here)"
+                        #     helper_text: "Two is my least favorite number"
+                        #     helper_text_mode: "on_error"
+                        # MDTextField:
+                        #     hint_text: "Max text length = 10"
+                        #     max_text_length: 10
+                        # MDTextField:
+                        #     hint_text: "required = True"
+                        #     required: True
+                        #     helper_text_mode: "on_error"
+                        # MDTextField:
+                        #     multiline: True
+                        #     hint_text: "Multi-line text"
+                        #     helper_text: "Messages are also supported here"
+                        #     helper_text_mode: "persistent"
+                        # MDTextField:
+                        #     hint_text: "color_mode = \'accent\'"
+                        #     color_mode: 'accent'
+                        # MDTextField:
+                        #     hint_text: "color_mode = \'custom\'"
+                        #     color_mode: 'custom'
+                        #     helper_text_mode: "on_focus"
+                        #     helper_text: "Color is defined by \'line_color_focus\' property"
+                        #     line_color_focus: self.theme_cls.opposite_bg_normal  # This is the color used by the textfield
+                        # MDTextField:
+                        #     hint_text: "disabled = True"
+                        #     disabled: True
+
+                        MDRaisedButton:
+                            text: "Generate Mnemonic"
+                            id: button_mnemonic
+                            size_hint: None, None
+                            size: 4 * dp(48), dp(48)
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            opposite_colors: True
+                            on_release: app.generate_mnemonic()
+
+                        MDRaisedButton:
+                            text: "Save Mnemonic"
+                            id : button_save_mnemonic
+                            size_hint: None, None
+                            size: 4 * dp(48), dp(48)
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            opposite_colors: True
+                            on_release: app.on_save(passphrase, repeat_passphrase)
+
+                        MDRaisedButton:
+                            text: "Login"
+                            id: button_login
+                            size_hint: None, None
+                            size: 4 * dp(48), dp(48)
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            opposite_colors: True
+                            on_release: app.on_login(passphrase)
+
+                        MDRaisedButton:
+                            text: "Show mnemonic"
+                            id: button_show_mnemonic
+                            size_hint: None, None
+                            size: 4 * dp(48), dp(48)
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            opposite_colors: True
+                            on_release: app.on_show_mnemonic()
+
+            Screen:
+                name: 'accordion'
+                BoxLayout:
+                    MDAccordion:
+                        orientation: 'vertical'
+                        size_hint_x: None
+                        width: '240dp'
+                        MDAccordionItem:
+                            title:'Item 1'
+                            icon: 'home'
+                            MDAccordionSubItem:
+                                text: "Subitem 1"
+                            MDAccordionSubItem:
+                                text: "Subitem 2"
+                            MDAccordionSubItem:
+                                text: "Subitem 3"
+                        MDAccordionItem:
+                            title:'Item 2'
+                            icon: 'earth'
+                            MDAccordionSubItem:
+                                text: "Subitem 4"
+                            MDAccordionSubItem:
+                                text: "Subitem 5"
+                            MDAccordionSubItem:
+                                text: "Subitem 6"
+                        MDAccordionItem:
+                            title:'Item 3'
+                            icon: 'account'
+                            MDAccordionSubItem:
+                                text: "Subitem 7"
+                            MDAccordionSubItem:
+                                text: "Subitem 8"
+                            MDAccordionSubItem:
+                                text: "Subitem 9"
+                    MDLabel:
+                        text: 'Content'
+                        theme_text_color: 'Primary'
+            
+            Screen:
+                name: 'bottom_navigation'
+                MDBottomNavigation:
+                    id: old_bottom_navigation_demo
+                    MDBottomNavigationItem:
+                        name: 'octagon'
+                        text: "Warning"
+                        icon: "alert-octagon"
+                        MDLabel:
+                            font_style: 'Body1'
+                            theme_text_color: 'Primary'
+                            text: "Warning!"
+                            halign: 'center'
+                    MDBottomNavigationItem:
+                        name: 'banking'
+                        text: "Bank"
+                        icon: 'bank'
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_y: None
+                            padding: dp(48)
+                            spacing: 10
+                            MDTextField:
+                                hint_text: "You can put any widgets here"
+                                helper_text: "Hello :)"
+                                helper_text_mode: "on_focus"
+                    MDBottomNavigationItem:
+                        name: 'bottom_navigation_desktop_1'
+                        text: "Hello"
+                        icon: 'alert'
+                        id: bottom_navigation_desktop_1
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_y: None
+                            padding: dp(48)
+                            spacing: 10
+                            MDTextField:
+                                hint_text: "Hello again"
+                    MDBottomNavigationItem:
+                        name: 'bottom_navigation_desktop_2'
+                        text: "Food"
+                        icon: 'food'
+                        id: bottom_navigation_desktop_2
+                        MDLabel:
+                            font_style: 'Body1'
+                            theme_text_color: 'Primary'
+                            text: "Cheese!"
+                            halign: 'center'
+            
