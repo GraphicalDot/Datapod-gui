@@ -102,8 +102,15 @@ class MainApp(App):
         return 
 
     def build(self):
+        import sys
+        if getattr(sys, 'frozen', False):
+            # frozen
+            dir_ = os.path.dirname(sys.executable)
+        else:
+            # unfrozen
+            dir_ = os.getcwd()
         self.main_widget =Builder.load_file(
-            os.path.join(os.path.dirname(__file__), "./latest.kv")
+            os.path.join(dir_, "./latest.kv")
         )
         self.theme_cls.theme_style = 'Dark'
 

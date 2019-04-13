@@ -84,9 +84,15 @@ NavigationLayout:
 
         NavigationDrawerIconButton:
             icon: 'checkbox-blank-circle'
-            text: "Data Apis"
+            text: "Data Platforms"
             on_release: app.root.ids.scr_mngr.current = 'datapis'
 
+
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: "Data Storage"
+            on_release: app.root.ids.scr_mngr.current = 'datastorage'
+        
         NavigationDrawerIconButton:
             icon: 'checkbox-blank-circle'
             text: "Bottom Navigation"
@@ -111,6 +117,84 @@ NavigationLayout:
             right_action_items: [['close', lambda x: app.on_close()]]
         ScreenManager:
             id: scr_mngr
+
+
+            Screen:
+                name: 'datastorage'
+                MDBottomNavigation:
+                    id: datastorage_navigation
+                    
+                    MDBottomNavigationItem:
+                        name: 'IPFS'
+                        text: "IPFS"
+                        icon: 'file'
+                        GridLayout:
+                            cols: 2
+                            ScrollView:
+                                MDList:
+                                    id: scroll
+                                    padding: dp(48)
+                                    spacing: 10
+
+                                    
+
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint_y: None
+                                padding: dp(48)
+                                spacing: 10
+                                MDLabel:
+                                    id: instagram_last_fetched
+                                    text: app.instagram_last_fetched
+                                    theme_text_color: 'Primary'
+                                MDTextField:
+                                    id: instagram_username
+                                    hint_text: "Instagram username"
+                                    helper_text: "Put your instragram username here"
+                                    helper_text_mode: "on_focus"
+                                
+                                MDTextField:
+                                    id: instagram_password
+                                    hint_text: "Instagram password"
+                                    helper_text: "Put your instrgram password here"
+                                    helper_text_mode: "on_focus"
+                                    password: True
+
+                                MDRaisedButton:
+                                    text: "Login"
+                                    opposite_colors: True
+                                    size_hint: None, None
+                                    size: 4 * dp(48), dp(48)
+                                    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+                                    on_release: app.on_instagram_login(instagram_username, instagram_password)
+
+
+                    MDBottomNavigationItem:
+                        name: 'amazon_s3'
+                        text: "Amazon S3"
+                        icon: 'cloud-circle'
+                        id: amazon_s3_navigation
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_y: None
+                            padding: dp(48)
+                            spacing: 10
+                            MDTextField:
+                                hint_text: "Hello again"
+                    MDBottomNavigationItem:
+                        name: 'google-storage'
+                        text: "Google Storage"
+                        icon: 'cloud'
+                        id: bottom_navigation_desktop_2
+                        MDLabel:
+                            font_style: 'Body1'
+                            theme_text_color: 'Primary'
+                            text: "Coming soon!!"
+                            halign: 'center'
+                
+                
+
 
             Screen:
                 name: 'datapis'

@@ -7,7 +7,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import aiohttp
 import asyncio
-import os
+import os, sys
 from kivy.logger import Logger
 from PIL import Image
 
@@ -17,7 +17,16 @@ INSTAGRAM_IMG_THUMBNAIL = "instagram_img_thumbnail"
 INSTAGRAM_IMG_OTHER = "instagram_img_other"
 INSTAGRAM_DIR = "instagram_images"
 
-dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if getattr(sys, 'frozen', False):
+    # frozen
+    dir_ = os.path.dirname(sys.executable)
+else:
+    # unfrozen
+    #dir_ = os.path.dirname(os.path.realpath(__file__))
+    dir_ = os.getcwd()
+
+
+dir_path = os.path.dirname(dir_)
 
 
 def save_on_filesystem(image_tuple):
