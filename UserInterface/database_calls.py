@@ -2,7 +2,8 @@
 
 import plyvel
 import json
-
+from kivy.logger import Logger
+    
 
 
 def instagram_batch_insert(posts):
@@ -21,7 +22,17 @@ def instagram_batch_insert(posts):
     db.close()
     return 
 
-def insert(key, value):
+def create_db_instance():
+    return plyvel.DB("./database", create_if_missing=True)
+
+def close_db_instance(db):
+    db.close()
+    Logger.info("DB instance closed")
+    return 
+
+
+def insert(db, key, value):
+    Logger.info(f"Inserting Key {key}")
     if isinstance(key, str):
         key = key.encode()
     
@@ -32,14 +43,21 @@ def insert(key, value):
         value = json.dumps(value).encode()
     
 
+    if not db:
+        db = plyvel.DB("./database", create_if_missing=True)
+    try:
+        db.put(key, value)
+    except Exception as e:
+        Logger.error(e)
+    if not db:
+        db.close()
+    Logger.info(f"Inserting Key Completed {key}")
 
-    db = plyvel.DB("./database", create_if_missing=True)
-    db.put(key, value)
-    db.close()
     return 
 
-
 def get(key):
+    Logger.info(f"Get Key {key}")
+
     if isinstance(key, str):
         key = key.encode()
 

@@ -24,8 +24,12 @@ from kivy.storage.jsonstore import JsonStore
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.factory import Factory
 from EncryptionModule.symmetric import generate_scrypt_key, aes_encrypt, aes_decrypt
-from instagram_api import instagram_login, get_all_posts, save_instagram
+from instagram_api import instagram_login, get_all_posts, save_instagram,  get_instagram_thumbnails
 from kivy.properties import ObjectProperty, ListProperty, StringProperty
+from kivy.logger import Logger
+from kivy.uix.image import AsyncImage
+from kivymd.list import TwoLineAvatarIconListItem
+from kivymd.selectioncontrols import MDCheckbox
 
 
 import datetime
@@ -42,22 +46,34 @@ store = JsonStore('config.json')
 
 
 
-class HackedDemoNavDrawer(MDNavigationDrawer):
-    # DO NOT USE
-    def add_widget(self, widget, index=0):
-        if issubclass(widget.__class__, BaseListItem):
-            self._list.add_widget(widget, index)
-            if len(self._list.children) == 1:
-                widget._active = True
-                self.active_item = widget
-            # widget.bind(on_release=lambda x: self.panel.toggle_state())
-            widget.bind(on_release=lambda x: x._set_active(True, list=self))
-        elif issubclass(widget.__class__, NavigationDrawerHeaderBase):
-            self._header_container.add_widget(widget)
-        else:
-            super(MDNavigationDrawer, self).add_widget(widget, index)
+# class HackedDemoNavDrawer(MDNavigationDrawer):
+#     # DO NOT USE
+#     def add_widget(self, widget, index=0):
+#         if issubclass(widget.__class__, BaseListItem):
+#             self._list.add_widget(widget, index)
+#             if len(self._list.children) == 1:
+#                 widget._active = True
+#                 self.active_item = widget
+#             # widget.bind(on_release=lambda x: self.panel.toggle_state())
+#             widget.bind(on_release=lambda x: x._set_active(True, list=self))
+#         elif issubclass(widget.__class__, NavigationDrawerHeaderBase):
+#             self._header_container.add_widget(widget)
+#         else:
+#             super(MDNavigationDrawer, self).add_widget(widget, index)
 
 
+
+class ContactPhoto(ILeftBody, AsyncImage):
+        pass
+
+class MessageButton(IRightBodyTouch, MDCheckbox):
+    #phone_number = StringProperty()
+    id = StringProperty()
+    def on_release(self):
+        # sample code:
+        #Dialer.send_sms(phone_number, "Hey! What's up?")
+        Logger.info(f"{self.id} has been clicked")
+        return 
 
 class MainApp(App):
     theme_cls = ThemeManager()
@@ -96,15 +112,33 @@ class MainApp(App):
         # self.main_widget.ids.text_field_error.bind(
         #     on_text_validate=self.set_error_message,
         #     on_focus=self.set_error_message)
+        self.update_instagram_images_list()
         self.bottom_navigation_remove_mobile(self.main_widget)
         #__list = Factory.Lists()
-        for i in range(10):
-            self.main_widget.ids.scroll.add_widget(
-                Factory.ThreeLineAvatarIconListItemCheckbox(text='Item %d' % i))
+        return self.main_widget
+
+
+    def update_instagram_images_list(self):
+        thumbnails = get_instagram_thumbnails()
+        for image in thumbnails:
+
+            item = TwoLineAvatarIconListItem(
+            text=f"Top Liker [ {image['top_likers'][0]} ]",
+            secondary_text=f"Total likes {image['likes']}"        )
+            item.add_widget(ContactPhoto(source =image["disk_name"]))
+            item.add_widget(MessageButton(id=image["id"]))
+            self.main_widget.ids.scroll.add_widget(item)
+
+            # new_widget = Factory.ThreeLineAvatarIconListItemCheckbox(
+            #         text=f'id-{image["id"]}')
+            # new_widget.add_widget(AvatarSampleWidget(source=image["disk_name"]))
+
+
 
         self.instagram_last_fetched = "Last Fetched from Instagram " + self.instagram_last()
+        return 
 
-        return self.main_widget
+
 
     def bottom_navigation_remove_mobile(self, widget):
         # Removes some items from bottom-navigation demo when on mobile
@@ -139,20 +173,10 @@ class MainApp(App):
                                       action=lambda *x: self.dialog.dismiss())
         self.dialog.open()
 
-    def show_example_long_dialog(self):
+    def loading_box(self):
         content = MDLabel(font_style='Body1',
                           theme_text_color='Secondary',
-                          text="Lorem ipsum dolor sit amet, consectetur "
-                               "adipiscing elit, sed do eiusmod tempor "
-                               "incididunt ut labore et dolore magna aliqua. "
-                               "Ut enim ad minim veniam, quis nostrud "
-                               "exercitation ullamco laboris nisi ut aliquip "
-                               "ex ea commodo consequat. Duis aute irure "
-                               "dolor in reprehenderit in voluptate velit "
-                               "esse cillum dolore eu fugiat nulla pariatur. "
-                               "Excepteur sint occaecat cupidatat non "
-                               "proident, sunt in culpa qui officia deserunt "
-                               "mollit anim id est laborum.",
+                          text="Please wait while we are fetching your instagram, Hang tight!!!",
                           size_hint_y=None,
                           valign='top')
         content.bind(texture_size=content.setter('size'))
@@ -160,11 +184,12 @@ class MainApp(App):
                                content=content,
                                size_hint=(.8, None),
                                height=dp(200),
-                               auto_dismiss=False)
+                               auto_dismiss=True)
 
-        self.dialog.add_action_button("Dismiss",
-                                      action=lambda *x: self.dialog.dismiss())
+        # self.dialog.add_action_button("Dismiss",
+        #                               action=lambda *x: self.dialog.dismiss())
         self.dialog.open()
+        return 
 
     def get_time_picker_data(self, instance, time):
         self.root.ids.time_picker_label.text = str(time)
@@ -250,10 +275,13 @@ class MainApp(App):
     def on_instagram_login(self, username, password):
         try:
             instagram_object = instagram_login(username.text, password.text)
+            #self.loading_box()
+            #Snackbar(text="Please wait for sometime, lets us fetch your Insta Handle").show()
+
             max_id, posts = get_all_posts(instagram_object)
 
             
-            
+            Logger.info("Now fetching images from instagram")
             save_instagram(posts)
             # with open("instagram.data","wb") as f:
             #     pickle.dump(posts, f)
@@ -261,7 +289,9 @@ class MainApp(App):
                 last_fetch_utc=datetime.datetime.utcnow().timestamp(),
                 last_fetch_local=datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat()
                  )
-        except:
+
+        except Exception as e:
+            Logger.error(e)
             Snackbar(text="Please check your instragram username and password again").show()
         return
         
@@ -352,8 +382,8 @@ class MainApp(App):
         self.address = hashlib.sha256(zeroth_public_key.encode()).hexdigest()
         return 
 
-class AvatarSampleWidget(ILeftBody, Image):
-    pass
+
+
 
 
 class IconLeftSampleWidget(ILeftBodyTouch, MDIconButton):

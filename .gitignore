@@ -6,3 +6,5 @@ __pycache__/
 include/*
 *.data
 *.database
+*build
+instagram_images/

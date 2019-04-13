@@ -1,18 +1,38 @@
 
 
 from InstagramAPI import InstagramAPI
-from database_calls import get, insert
+from database_calls import get, insert, create_db_instance, close_db_instance
 import time
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import aiohttp
 import asyncio
+import os
 from kivy.logger import Logger
+from PIL import Image
 
 
 INSTAGRAM_KEY_NAME = "instagram"
 INSTAGRAM_IMG_THUMBNAIL = "instagram_img_thumbnail"
 INSTAGRAM_IMG_OTHER = "instagram_img_other"
+INSTAGRAM_DIR = "instagram_images"
+
+dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def save_on_filesystem(image_tuple):
+    image_id = image_tuple[0]
+
+    for image in image_tuple[1]:
+        name = dir_path + "/"+ INSTAGRAM_DIR + "/"+ image_id + "-" + str(image["width"]) + "."+image["content_type"].split("/")[-1]
+        with open(name, "wb") as f:
+            f.write(image["data"])
+    return 
+
+def get_instagram_thumbnails():
+    thumbnails = get(INSTAGRAM_IMG_THUMBNAIL)
+    Logger.info(thumbnails)
+    return thumbnails
 
 def save_instagram(posts):
 
@@ -20,6 +40,7 @@ def save_instagram(posts):
     ##right now fecthing only the (240, 240) size image 
     ##from the cdn
     url_list = instagram_image_thumbnails(posts)
+    Logger.info(url_list)
 
     ##fetch alll images from the instagram cdn 
     ##will be a list of tuples, with first entry as 
@@ -35,20 +56,22 @@ def save_instagram(posts):
     instagram_img_thumbnail= []
     instagram_img_other = []
 
-    for (image_id, image_data) in image_data_list:
+    for (image_id, image_likes, image_top_likers, image_data) in image_data_list:
         for image in image_data:
-            image.update({"id": image_id})
+            image.update({"id": image_id, "likes": image_likes, "top_likers": image_top_likers})
             if image["width"] == 240:
                 instagram_img_thumbnail.append(image)
             else:
                 instagram_img_other.append(image)
 
-    Logger.warning(instagram_img_thumbnail[0])
-    Logger.warning(instagram_img_other[0])
-    insert(INSTAGRAM_KEY_NAME, posts)
-    insert(INSTAGRAM_IMG_THUMBNAIL, instagram_img_thumbnail)
-    insert(INSTAGRAM_IMG_OTHER, instagram_img_other)
-
+    Logger.warning(instagram_img_thumbnail[0].keys())
+    Logger.warning(instagram_img_other[0].keys())
+    db = create_db_instance()
+    insert(db, INSTAGRAM_KEY_NAME, posts)
+    insert(db, INSTAGRAM_IMG_THUMBNAIL, instagram_img_thumbnail)
+    insert(db, INSTAGRAM_IMG_OTHER, instagram_img_other)
+    close_db_instance(db)
+    Logger.info("Insert operations for instgram completed")
     return 
 
 
@@ -76,7 +99,7 @@ def instagram_image_thumbnails(posts=None):
     url_list = []
     for post in posts: 
         _id = post["id"] 
-        url_list.append((_id, post["image_versions2"]["candidates"])) 
+        url_list.append((_id, post["like_count"], post["top_likers"], post["image_versions2"]["candidates"])) 
     return url_list
 
 def instagram_login(username, password):
@@ -114,10 +137,12 @@ def get_all_posts(instagram_object, myposts=[]):
 
 
 async def get_instagram_image(urls):
-
+    Logger.info(f"NOw fetching {urls}")
+    ##urls [1] is like_count
+    ##urls [2] is top likers
     result = []
-    image_id = "instagram"+ urls[0]
-    image_url_list = urls[1]
+    image_id = "instagram-"+ urls[0]
+    image_url_list = urls[-1]
     for url_data in image_url_list:
         async with aiohttp.ClientSession() as session:
             # create get request
@@ -130,29 +155,34 @@ async def get_instagram_image(urls):
                     return None
                 response.close()
 
+
+        name = dir_path + "/"+ INSTAGRAM_DIR + "/"+ image_id + "-" + str(url_data["width"]) + "."+response.content_type.split("/")[-1]
+        with open(name, "wb") as f:
+            f.write(data)
+
         result.append({
                 "width": url_data["width"], "height": url_data["height"], 
                 "url": url_data["url"], 
                 "content_type": response.content_type,
-                "data": data     
+                "disk_name": name
 
         })
 
-    return (image_id, result)
+
+    return (image_id, urls[1], urls[2], result)
 
 
 def get_instagram_images(pages):
 
-    loop = asyncio.new_event_loop()
+    loop = asyncio.get_event_loop()
     # for page in pages:
     #     tasks.append(loop.create_task(print_preview(page)))
 
-    executor = ThreadPoolExecutor(max_workers=10)
-    tasks = [loop.run_in_executor(executor, get_instagram_image, url) for url in pages]
-    #tasks = [loop.create_task(get_instagram_image(url)) for url in pages]
+    #executor = ThreadPoolExecutor(max_workers=10)
+    #tasks = [loop.run_in_executor(executor, get_instagram_image, url) for url in pages]
+    tasks = [loop.create_task(get_instagram_image(url)) for url in pages]
     several_futures = asyncio.gather(*tasks)
     results = loop.run_until_complete(several_futures)
 
     #loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
     return results

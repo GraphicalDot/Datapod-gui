@@ -52,13 +52,6 @@
             on_press: self.change_content()
 
 
-<ListItemWithCheckbox@OneLineAvatarIconListItem>:
-    text: "Single-line + avatar&icon"
-    AvatarSampleWidget:
-        source: './assets/avatar.png'
-    IconRightSampleWidget:
-    MDCheckbox:
-
 
 <ThreeLineAvatarIconListItemCheckbox@ThreeLineAvatarIconListItem>:
     text: "Three-line item..."
@@ -127,7 +120,7 @@ NavigationLayout:
                     MDBottomNavigationItem:
                         name: 'instagram'
                         text: "Instagram"
-                        icon: 'bank'
+                        icon: 'instagram'
                         GridLayout:
                             cols: 2
                             ScrollView:
@@ -172,8 +165,8 @@ NavigationLayout:
 
                     MDBottomNavigationItem:
                         name: 'bottom_navigation_desktop_1'
-                        text: "Hello"
-                        icon: 'alert'
+                        text: "Whatsapp"
+                        icon: 'whatsapp'
                         id: bottom_navigation_desktop_1
                         BoxLayout:
                             orientation: 'vertical'
@@ -184,15 +177,25 @@ NavigationLayout:
                                 hint_text: "Hello again"
                     MDBottomNavigationItem:
                         name: 'bottom_navigation_desktop_2'
-                        text: "Food"
-                        icon: 'food'
+                        text: "Twitter"
+                        icon: 'twitter'
                         id: bottom_navigation_desktop_2
                         MDLabel:
                             font_style: 'Body1'
                             theme_text_color: 'Primary'
-                            text: "Cheese!"
+                            text: "Coming soon!!"
                             halign: 'center'
                 
+                    MDBottomNavigationItem:
+                        name: 'bottom_navigation_desktop_2'
+                        text: "Facebook"
+                        icon: 'facebook'
+                        id: bottom_navigation_desktop_2
+                        MDLabel:
+                            font_style: 'Body1'
+                            theme_text_color: 'Primary'
+                            text: "Coming soon!!"
+                            halign: 'center'
 
             Screen:
                 name: 'bottomsheet'
