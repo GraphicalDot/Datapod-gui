@@ -17,6 +17,8 @@ INSTAGRAM_IMG_THUMBNAIL = "instagram_img_thumbnail"
 INSTAGRAM_IMG_OTHER = "instagram_img_other"
 INSTAGRAM_DIR = "instagram_images"
 
+
+
 if getattr(sys, 'frozen', False):
     # frozen
     dirpath = os.path.dirname(sys.executable)
@@ -32,7 +34,7 @@ def save_on_filesystem(image_tuple):
     image_id = image_tuple[0]
 
     for image in image_tuple[1]:
-        name = dir_path + "/"+ INSTAGRAM_DIR + "/"+ image_id + "-" + str(image["width"]) + "."+image["content_type"].split("/")[-1]
+        name = dirpath + "/"+ INSTAGRAM_DIR + "/"+ image_id + "-" + str(image["width"]) + "."+image["content_type"].split("/")[-1]
         with open(name, "wb") as f:
             f.write(image["data"])
     return 
@@ -75,9 +77,9 @@ def save_instagram(posts):
     Logger.warning(instagram_img_thumbnail[0].keys())
     Logger.warning(instagram_img_other[0].keys())
     db = create_db_instance()
-    insert(db, INSTAGRAM_KEY_NAME, posts)
-    insert(db, INSTAGRAM_IMG_THUMBNAIL, instagram_img_thumbnail)
-    insert(db, INSTAGRAM_IMG_OTHER, instagram_img_other)
+    insert(INSTAGRAM_KEY_NAME, posts, db)
+    insert(INSTAGRAM_IMG_THUMBNAIL, instagram_img_thumbnail, db)
+    insert(INSTAGRAM_IMG_OTHER, instagram_img_other, db)
     close_db_instance(db)
     Logger.info("Insert operations for instgram completed")
     return 
@@ -164,7 +166,7 @@ async def get_instagram_image(urls):
                 response.close()
 
 
-        name = dir_path + "/"+ INSTAGRAM_DIR + "/"+ image_id + "-" + str(url_data["width"]) + "."+response.content_type.split("/")[-1]
+        name = dirpath + "/"+ INSTAGRAM_DIR + "/"+ image_id + "-" + str(url_data["width"]) + "."+response.content_type.split("/")[-1]
         with open(name, "wb") as f:
             f.write(data)
 

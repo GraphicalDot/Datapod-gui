@@ -31,7 +31,7 @@ def close_db_instance(db):
     return 
 
 
-def insert(db, key, value):
+def insert(key, value, db_instance=None):
     Logger.info(f"Inserting Key {key}")
     if isinstance(key, str):
         key = key.encode()
@@ -43,14 +43,14 @@ def insert(db, key, value):
         value = json.dumps(value).encode()
     
 
-    if not db:
-        db = plyvel.DB("./database", create_if_missing=True)
+    if not db_instance:
+        db_instance = plyvel.DB("./database", create_if_missing=True)
     try:
-        db.put(key, value)
+        db_instance.put(key, value)
     except Exception as e:
         Logger.error(e)
-    if not db:
-        db.close()
+    if not db_instance:
+        db_instance.close()
     Logger.info(f"Inserting Key Completed {key}")
 
     return 
@@ -73,6 +73,24 @@ def get(key):
         return json.loads(value)  
 
     except json.JSONDecodeError:
-        return str(value)
+        return value.decode()
+
+    return 
+
+
+def delete(key):
+    Logger.info(f"Delete Key {key}")
+
+    if isinstance(key, str):
+        key = key.encode()
+
+    db = plyvel.DB("./database", create_if_missing=True)
+    value = db.get(key)
+    if not value:
+        Logger.error(f"Key is not present {key}")
+        return None
+
+    db.delete(key)
+    db.close()
 
     return 

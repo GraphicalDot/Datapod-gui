@@ -61,7 +61,7 @@
     IconRightSampleWidget:   
 
 <ContentNavigationDrawer@MDNavigationDrawer>:
-    drawer_logo: 'assets/profile.jpg'
+    drawer_logo: 'assets/logo.png'
 
 NavigationLayout:
     id: nav_layout
@@ -69,10 +69,15 @@ NavigationLayout:
         id: nav_drawer
         NavigationDrawerToolbar:
             title: "Navigation Drawer"
+        #NavigationDrawerIconButton:
+        #    icon: 'checkbox-blank-circle'
+        #    text: "Accordion"
+        #    on_release: app.root.ids.scr_mngr.current = 'accordion'
+
         NavigationDrawerIconButton:
             icon: 'checkbox-blank-circle'
-            text: "Accordion"
-            on_release: app.root.ids.scr_mngr.current = 'accordion'
+            text: "Data Platforms"
+            on_release: app.root.ids.scr_mngr.current = 'datapis'
 
         NavigationDrawerIconButton:
             icon: 'checkbox-blank-circle'
@@ -82,10 +87,7 @@ NavigationLayout:
 
 
 
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Data Platforms"
-            on_release: app.root.ids.scr_mngr.current = 'datapis'
+
 
 
         NavigationDrawerIconButton:
@@ -93,18 +95,18 @@ NavigationLayout:
             text: "Data Storage"
             on_release: app.root.ids.scr_mngr.current = 'datastorage'
         
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Bottom Navigation"
-            on_release: app.root.ids.scr_mngr.current = 'bottom_navigation'
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Bottom Sheets"
-            on_release: app.root.ids.scr_mngr.current = 'bottomsheet'
-        NavigationDrawerIconButton:
-            icon: 'checkbox-blank-circle'
-            text: "Buttons"
-            on_release: app.root.ids.scr_mngr.current = 'button'
+        #NavigationDrawerIconButton:
+        #    icon: 'checkbox-blank-circle'
+        #    text: "Bottom Navigation"
+        #    on_release: app.root.ids.scr_mngr.current = 'bottom_navigation'
+        #NavigationDrawerIconButton:
+        #    icon: 'checkbox-blank-circle'
+        #    text: "Bottom Sheets"
+        #    on_release: app.root.ids.scr_mngr.current = 'bottomsheet'
+        #NavigationDrawerIconButton:
+        #    icon: 'checkbox-blank-circle'
+        #    text: "Buttons"
+        #    on_release: app.root.ids.scr_mngr.current = 'button'
        
     BoxLayout:
         orientation: 'vertical'
@@ -144,30 +146,7 @@ NavigationLayout:
                                 size_hint_y: None
                                 padding: dp(48)
                                 spacing: 10
-                                MDLabel:
-                                    id: instagram_last_fetched
-                                    text: app.instagram_last_fetched
-                                    theme_text_color: 'Primary'
-                                MDTextField:
-                                    id: instagram_username
-                                    hint_text: "Instagram username"
-                                    helper_text: "Put your instragram username here"
-                                    helper_text_mode: "on_focus"
                                 
-                                MDTextField:
-                                    id: instagram_password
-                                    hint_text: "Instagram password"
-                                    helper_text: "Put your instrgram password here"
-                                    helper_text_mode: "on_focus"
-                                    password: True
-
-                                MDRaisedButton:
-                                    text: "Login"
-                                    opposite_colors: True
-                                    size_hint: None, None
-                                    size: 4 * dp(48), dp(48)
-                                    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
-                                    on_release: app.on_instagram_login(instagram_username, instagram_password)
 
 
                     MDBottomNavigationItem:
@@ -282,6 +261,135 @@ NavigationLayout:
                             halign: 'center'
 
             Screen:
+                name: 'login'
+                ScrollView:
+                    BoxLayout:
+                        orientation: 'vertical'
+                        id: login_box
+                        size_hint_y: None
+                        height: self.minimum_height
+                        padding: dp(48)
+                        spacing: 10
+                        
+                        MDTextField:
+                            hint_text: "24 word mnemonic"
+                            id: mnemonic
+                            multiline: True
+                            text: app.mnemonic
+                            disabled: app.enabled_mnemonic
+                            required: True
+                            opposite_colors: True
+
+                        MDTextField:
+                            multiline: True
+                            hint_text: "Blockchain Address"
+                            id: address
+                            text: app.address
+                            helper_text_mode: "on_focus"
+                            disabled: app.enabled_address
+                            required: True
+                            opposite_colors: True
+
+                        MDTextField:
+                            #id: text_field_error
+                            id: passphrase
+                            text: app.passphrase
+                            hint_text: "Passphrase"
+                            helper_text: "Passphrase to encrypt your password"
+                            required: True
+
+                        MDTextField:
+                            text: app.repeat_passphrase
+                            id: repeat_passphrase
+                            hint_text: "Repeat passphrase"
+                            helper_text: "Passphrase to encrypt your password"
+                            required: True
+
+                        # MDTextField:
+                        #     id: text_field_error
+                        #     hint_text: "Helper text on error (Hit Enter with two characters here)"
+                        #     helper_text: "Two is my least favorite number"
+                        #     helper_text_mode: "on_error"
+                        # MDTextField:
+                        #     hint_text: "Max text length = 10"
+                        #     max_text_length: 10
+                        # MDTextField:
+                        #     hint_text: "required = True"
+                        #     required: True
+                        #     helper_text_mode: "on_error"
+                        # MDTextField:
+                        #     multiline: True
+                        #     hint_text: "Multi-line text"
+                        #     helper_text: "Messages are also supported here"
+                        #     helper_text_mode: "persistent"
+                        # MDTextField:
+                        #     hint_text: "color_mode = \'accent\'"
+                        #     color_mode: 'accent'
+                        # MDTextField:
+                        #     hint_text: "color_mode = \'custom\'"
+                        #     color_mode: 'custom'
+                        #     helper_text_mode: "on_focus"
+                        #     helper_text: "Color is defined by \'line_color_focus\' property"
+                        #     line_color_focus: self.theme_cls.opposite_bg_normal  # This is the color used by the textfield
+                        # MDTextField:
+                        #     hint_text: "disabled = True"
+                        #     disabled: True
+
+                        GridLayout:
+                            #orientation: 'horizontal'
+                            cols: 5
+                            #size_hint_y: None
+                            padding: dp(48)
+                            spacing: 10
+                            id: login_grid_layout
+                            MDRaisedButton:
+                                text: "Generate Mnemonic"
+                                id: button_mnemonic
+                                #size_hint: None, None
+                                size: 4 * dp(48), dp(48)
+                                #pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                opposite_colors: True
+                                on_release: app.generate_mnemonic()
+
+                            MDRaisedButton:
+                                text: "Save Mnemonic"
+                                id : button_save_mnemonic
+                                #size_hint: None, None
+                                size: 4 * dp(48), dp(48)
+                                #pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                opposite_colors: True
+                                on_release: app.on_save_mnemonic(passphrase, repeat_passphrase)
+
+                            MDRaisedButton:
+                                text: "Login"
+                                id: button_login
+                                #size_hint: None, None
+                                size: 4 * dp(48), dp(48)
+                                #pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                opposite_colors: True
+                                on_release: app.on_login(passphrase)
+
+                            MDRaisedButton:
+                                text: "Show mnemonic"
+                                id: button_show_mnemonic
+                                #size_hint: None, None
+                                size: 4 * dp(48), dp(48)
+                                #pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                opposite_colors: True
+                                on_release: app.on_show_mnemonic()
+
+                            MDRaisedButton:
+                                text: "Logout"
+                                id: button_logout
+                                #size_hint: None, None
+                                size: 4 * dp(48), dp(48)
+                                #pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                opposite_colors: True
+                                on_release: app.on_logout()
+
+
+
+            Screen:
                 name: 'bottomsheet'
                 MDRaisedButton:
                     text: "Open list bottom sheet"
@@ -359,114 +467,7 @@ NavigationLayout:
                     opposite_colors: True
                     on_release: app.show_example_snackbar('verylong')
 
-            Screen:
-                name: 'login'
-                ScrollView:
-                    BoxLayout:
-                        orientation: 'vertical'
-                        id: login_box
-                        size_hint_y: None
-                        height: self.minimum_height
-                        padding: dp(48)
-                        spacing: 10
-                        
-                        MDTextField:
-                            hint_text: "24 word mnemonic"
-                            id: mnemonic
-                            multiline: True
-                            text: app.mnemonic
-                            disabled: app.enabled_mnemonic
-                            required: True
-
-                        MDTextField:
-                            multiline: True
-                            hint_text: "Blockchain Address"
-                            id: address
-                            text: app.address
-                            helper_text_mode: "on_focus"
-                            disabled: app.enabled_address
-                            required: True
-
-                        MDTextField:
-                            #id: text_field_error
-                            id: passphrase
-                            text: app.passphrase
-                            hint_text: "Passphrase"
-                            helper_text: "Passphrase to encrypt your password"
-                            required: True
-
-                        MDTextField:
-                            text: app.repeat_passphrase
-                            id: repeat_passphrase
-                            hint_text: "Repeat passphrase"
-                            helper_text: "Passphrase to encrypt your password"
-                            required: True
-
-                        # MDTextField:
-                        #     id: text_field_error
-                        #     hint_text: "Helper text on error (Hit Enter with two characters here)"
-                        #     helper_text: "Two is my least favorite number"
-                        #     helper_text_mode: "on_error"
-                        # MDTextField:
-                        #     hint_text: "Max text length = 10"
-                        #     max_text_length: 10
-                        # MDTextField:
-                        #     hint_text: "required = True"
-                        #     required: True
-                        #     helper_text_mode: "on_error"
-                        # MDTextField:
-                        #     multiline: True
-                        #     hint_text: "Multi-line text"
-                        #     helper_text: "Messages are also supported here"
-                        #     helper_text_mode: "persistent"
-                        # MDTextField:
-                        #     hint_text: "color_mode = \'accent\'"
-                        #     color_mode: 'accent'
-                        # MDTextField:
-                        #     hint_text: "color_mode = \'custom\'"
-                        #     color_mode: 'custom'
-                        #     helper_text_mode: "on_focus"
-                        #     helper_text: "Color is defined by \'line_color_focus\' property"
-                        #     line_color_focus: self.theme_cls.opposite_bg_normal  # This is the color used by the textfield
-                        # MDTextField:
-                        #     hint_text: "disabled = True"
-                        #     disabled: True
-
-                        MDRaisedButton:
-                            text: "Generate Mnemonic"
-                            id: button_mnemonic
-                            size_hint: None, None
-                            size: 4 * dp(48), dp(48)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            opposite_colors: True
-                            on_release: app.generate_mnemonic()
-
-                        MDRaisedButton:
-                            text: "Save Mnemonic"
-                            id : button_save_mnemonic
-                            size_hint: None, None
-                            size: 4 * dp(48), dp(48)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            opposite_colors: True
-                            on_release: app.on_save(passphrase, repeat_passphrase)
-
-                        MDRaisedButton:
-                            text: "Login"
-                            id: button_login
-                            size_hint: None, None
-                            size: 4 * dp(48), dp(48)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            opposite_colors: True
-                            on_release: app.on_login(passphrase)
-
-                        MDRaisedButton:
-                            text: "Show mnemonic"
-                            id: button_show_mnemonic
-                            size_hint: None, None
-                            size: 4 * dp(48), dp(48)
-                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                            opposite_colors: True
-                            on_release: app.on_show_mnemonic()
+            
 
             Screen:
                 name: 'accordion'

@@ -4,7 +4,7 @@ bin/
 share/
 __pycache__/
 include/*
-*.data
-*.database
+*data
+*packages
 *build
-instagram_images/
+
