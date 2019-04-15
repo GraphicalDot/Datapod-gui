@@ -1,5 +1,4 @@
  
-from kivy.logger import Logger
 
 SERVER = "imap.gmail.com"
 
@@ -13,6 +12,11 @@ EMAIL_ACCOUNT = "your@gmail.com"
 PASSWORD = "your password"
 
 
+
+import coloredlogs, verboselogs, logging
+verboselogs.install()
+coloredlogs.install()
+logger = logging.getLogger(__name__)
 
 
 
@@ -58,35 +62,45 @@ class Emails(object):
             self.inbox_type = "inbox"
 
         if not mail_type:
-            self.mail_type = "UNSEEN"
+            self.mail_type = "ALL"
     
-        self.data_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/emails/gmail")
-        if not os.path.exists(self.data_dir):
-            os.makedirs(self.data_dir) 
+        self.email_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/emails")
+        if not os.path.exists(self.email_dir):
+            os.makedirs(self.email_dir) 
 
+        self.image_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/images")
+        if not os.path.exists(self.image_dir):
+            os.makedirs(self.image_dir) 
 
-
+        self.pdf_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/pdfs")
+        if not os.path.exists(self.pdf_dir):
+            os.makedirs(self.pdf_dir) 
+        logger.info("App intiation been done")
 
     def connect(self, username, password):
         self.mail_instance = imaplib.IMAP4_SSL(self.server_name)
         self.mail_instance.login(username, password)
         self.mail_instance.list()
         self.mail_instance.select(self.inbox_type)
+        logger.info("COnnected successffuly")
 
 
     def fetch_email_ids(self):
         result, self.emails = self.mail_instance.uid('search', None, self.mail_type) # (ALL/UNSEEN)
         if result != "OK":
-            Logger.error("Couldnt log into the mail server")
+            logger.error("Couldnt log into the mail server")
             raise Exception("Couldnt log into the mail server")
 
     def download_emails(self):
         """
         Downloding list of emails from the gmail server
         """
+        logger.info("Executing download emails")
 
         self.fetch_email_ids()
         i = len(self.emails[0].split())
+        logger.info(f"NUmber of emails is {i}")
+
         #TODO: remove indexing on list
         for x in range(i):
             email_uid = self.emails[0].split()[x]
@@ -122,30 +136,52 @@ class Emails(object):
 
 
     def save_email(self, email_uid, email_from, email_to, subject, local_message_date, email_message):
-        
         # Body details
-        Logger.info(f"email_uid={email_uid}, email_from={email_from}, email_to={email_to}, subject={subject}, local_message_date={local_message_date}")
+        logger.info(f"email_uid={email_uid}, email_from={email_from}, email_to={email_to}, subject={subject}, local_message_date={local_message_date}")
         for part in email_message.walk():
+            if part.get_content_maintype() == 'multipart':
+                continue
+            if part.get('Content-Disposition') is None:
+                logger.warning(f"CONTENT Dispostion is {part.get('Content-Disposition')}")
+                continue
+
+
             body = part.get_payload(decode=True)
+            content_type= part.get_content_type()
             file_name = "email_" + str(email_uid) + ".txt"
 
-            j_file_name = f"From:[{email_from}]Date:[{local_message_date}]UID:[{str(email_uid)}Content-type:[{part.get_content_type()}]]"
+            j_file_name = f"From:[{email_from}]Date:[{local_message_date}]UID:[{str(email_uid)}Content-type:[{content_type}]]"
             
-            file_path = os.path.join(self.data_dir, file_name)
-            Logger.info(f"J_Filepath {j_file_name}")
+            file_path = os.path.join(self.email_dir, file_name)
+            logger.info(f"J_Filepath {j_file_name}")
+            
+            
+            attachment_name = part.get_filename()
+            if attachment_name:
+                if content_type == "application/pdf":
+                    with open(os.path.join(self.pdf_dir, attachment_name), "wb") as f:
+                        f.write(part.get_payload(decode=True))
 
+                if content_type.startswith("image"):
+                    with open(os.path.join(self.image_dir, attachment_name), "wb") as f:
+                        f.write(part.get_payload(decode=True))
+ 
+            
+            logger.info(f"Attachment in the email name is  {attachment_name}")
 
             output_file = open(file_path, 'w')
             if body:
                 output_file.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to,local_message_date, subject, base64.b64encode(body)))
             else:
-                Logger.error(f"Body couldnt be parsed for {file_name}")
+                logger.error(f"Body couldnt be parsed for {file_name}")
                 output_file.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to,local_message_date, subject, "Body coudlnt be parsed"))
 
             output_file.close()
         return 
 
 if __name__ == "__main__":
+    logger.info("App started")
     email_instance = Emails(SERVER)
-    email_instance.connect("houzier.saurav@gmail.com", "Groot1234#")
+    email_instance.connect("dummy.houzier.saurav@gmail.com", "Groot1234#")
     email_instance.download_emails()
+    logger.info("App Ended")
