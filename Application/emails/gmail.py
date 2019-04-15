@@ -1,7 +1,7 @@
  
 
 SERVER = "imap.gmail.com"
-
+from pprint import pprint
 import datetime
 import email
 import imaplib
@@ -64,9 +64,13 @@ class Emails(object):
         if not mail_type:
             self.mail_type = "ALL"
     
-        self.email_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/emails")
-        if not os.path.exists(self.email_dir):
-            os.makedirs(self.email_dir) 
+        self.email_dir_txt = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/emails_txt")
+        if not os.path.exists(self.email_dir_txt):
+            os.makedirs(self.email_dir_txt) 
+
+        self.email_dir_html = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/email_html")
+        if not os.path.exists(self.email_dir_html):
+            os.makedirs(self.email_dir_html)
 
         self.image_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/images")
         if not os.path.exists(self.image_dir):
@@ -138,8 +142,81 @@ class Emails(object):
     def save_email(self, email_uid, email_from, email_to, subject, local_message_date, email_message):
         # Body details
         logger.info(f"email_uid={email_uid}, email_from={email_from}, email_to={email_to}, subject={subject}, local_message_date={local_message_date}")
+        file_name_text = "email_" + str(email_uid) + ".txt"
+        file_name_html = "email_" + str(email_uid) + ".html"
+        #multipart/mixed,  multipart/alternative, text/html
+        body = ""
+        html_body = "" 
+        if email_message.is_multipart():
+            for part in email_message.walk():
+                ctype = part.get_content_type()
+                cdispo = str(part.get('Content-Disposition'))
+
+                # skip any text/plain (txt) attachments
+                if ctype == 'text/plain' and 'attachment' not in cdispo:
+                    nbody = part.get_payload(decode=True)  # decode
+                    body = body + nbody.decode()
+
+                elif ctype == 'text/html' and 'attachment' not in cdispo:
+                    ##this is generally the same as text/plain but has 
+                    ##html embedded into it. save it another file with 
+                    ##html extension
+                    hbody = part.get_payload(decode=True)  # decode
+                    html_body = html_body + hbody.decode()
+
+                else:
+                    ##most of the times, this code block will have junk mime 
+                    ##type except the attachment part 
+
+                    if part.get_filename():
+                        attachment_name = part.get_filename() + "__"+ str(email_uid)
+                        if ctype.startswith("image"):
+                            with open(os.path.join(self.image_dir, attachment_name), "wb") as f:
+                                f.write(part.get_payload(decode=True))
+                            
+                        elif ctype == "application/pdf":
+                            with open(os.path.join(self.pdf_dir, attachment_name), "wb") as f:
+                                f.write(part.get_payload(decode=True))
+
+                        else:
+                            logger.error(f"Mostly junk MIME type {ctype}")
+                    else:
+                            logger.error(f"Mostly junk MIME type {ctype} without a file_name")
+
+
+
+            # not multipart - i.e. plain text, no attachments, keeping fingers crossed
+            pprint(body)
+
+        else:
+            #when the email is just plain text
+            body = part.get_payload(decode=True)
+            logger.error("Sumple email found")
+
+        file_path_text = os.path.join(self.email_dir_txt, file_name_text)
+        file_path_html = os.path.join(self.email_dir_html, file_name_html)
+
+        with open(file_path_text, "wb") as f:
+            f.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to, local_message_date, subject, body.encode()))
+
+        with open(file_path_html, "wb") as f:
+            f.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to, local_message_date, subject, html_body))
+
+        logger.info("\n")
+        return 
+
+
+    def old_save_email(self, email_uid, email_from, email_to, subject, local_message_date, email_message):
+        # Body details
+        """
+        logger.info(f"email_uid={email_uid}, email_from={email_from}, email_to={email_to}, subject={subject}, local_message_date={local_message_date}")
         for part in email_message.walk():
+            
+            body = part.get_payload(decode=True)
+
             if part.get_content_maintype() == 'multipart':
+            
+                logger.info(body)
                 continue
             if part.get('Content-Disposition') is None:
                 logger.warning(f"CONTENT Dispostion is {part.get('Content-Disposition')}")
@@ -158,29 +235,25 @@ class Emails(object):
             
             attachment_name = part.get_filename()
             if attachment_name:
-                if content_type == "application/pdf":
-                    with open(os.path.join(self.pdf_dir, attachment_name), "wb") as f:
-                        f.write(part.get_payload(decode=True))
-
-                if content_type.startswith("image"):
-                    with open(os.path.join(self.image_dir, attachment_name), "wb") as f:
-                        f.write(part.get_payload(decode=True))
- 
+                
             
             logger.info(f"Attachment in the email name is  {attachment_name}")
 
             output_file = open(file_path, 'w')
             if body:
                 output_file.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to,local_message_date, subject, base64.b64encode(body)))
+                logger.info(f"Body was parsed for {email_uid}")
             else:
-                logger.error(f"Body couldnt be parsed for {file_name}")
+                logger.error(f"Body couldnt be parsed for {email_uid}")
                 output_file.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to,local_message_date, subject, "Body coudlnt be parsed"))
 
             output_file.close()
+        logger.info("\n")
+        """
         return 
 
 if __name__ == "__main__":
-    logger.info("App started")
+    logger.error("App started")
     email_instance = Emails(SERVER)
     email_instance.connect("dummy.houzier.saurav@gmail.com", "Groot1234#")
     email_instance.download_emails()
