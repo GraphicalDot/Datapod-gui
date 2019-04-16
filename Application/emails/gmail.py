@@ -79,6 +79,10 @@ class Emails(object):
         self.pdf_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/pdfs")
         if not os.path.exists(self.pdf_dir):
             os.makedirs(self.pdf_dir) 
+
+        self.extra_dir = os.path.join(os.path.dirname(os.getcwd()), "user_data/mails/gmail/extra")
+        if not os.path.exists(self.extra_dir):
+            os.makedirs(self.extra_dir) 
         logger.info("App intiation been done")
 
     def connect(self, username, password):
@@ -146,7 +150,8 @@ class Emails(object):
         file_name_html = "email_" + str(email_uid) + ".html"
         #multipart/mixed,  multipart/alternative, multipart/related, text/html
         body = ""
-        html_body = "" 
+        html_body = ""
+        attachments = "\n"
         if email_message.is_multipart():
             for part in email_message.walk():
                 ctype = part.get_content_type()
@@ -180,7 +185,10 @@ class Emails(object):
                                 f.write(part.get_payload(decode=True))
 
                         else:
-                            logger.error(f"Mostly junk MIME type {ctype}")
+                            with open(os.path.join(self.extra_dir, attachment_name), "wb") as f:
+                                f.write(part.get_payload(decode=True))
+
+                        attachments += f"{attachment_name}\n"
                     else:
                             logger.error(f"Mostly junk MIME type {ctype} without a file_name")
 
@@ -197,13 +205,14 @@ class Emails(object):
         file_path_text = os.path.join(self.email_dir_txt, file_name_text)
         file_path_html = os.path.join(self.email_dir_html, file_name_html)
 
+        nl = "\r\n"
         with open(file_path_text, "wb") as f:
-            data = f"From: {email_from}\nTo: {email_to}\nDate: {local_message_date}\nSubject: {subject}\n\nBody: \n\n{body.encode()}"
+            data = f"From: {email_from}{nl}To: {email_to}{nl}Date: {local_message_date}{nl}Attachments:{attachments}{nl}Subject: {subject}{nl}\nBody: {nl}{body.encode()}"
             logger.info(f"TEXT BODY {data}")
             f.write(data.encode())
 
         with open(file_path_html, "wb") as f:
-            data = f"From: {email_from}\nTo: {email_to}\nDate: {local_message_date}\nSubject: {subject}\n\nBody: \n\n{html_body.encode()}"
+            data = f"From: {email_from}{nl}To: {email_to}{nl}Date: {local_message_date}{nl}Attachments:{attachments}{nl}Subject: {subject}{nl}\nBody: {nl}{html_body.encode()}"
             logger.info(f"HTML BODY {data}")
             f.write(data.encode())
 
