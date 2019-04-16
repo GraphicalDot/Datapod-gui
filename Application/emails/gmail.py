@@ -144,12 +144,13 @@ class Emails(object):
         logger.info(f"email_uid={email_uid}, email_from={email_from}, email_to={email_to}, subject={subject}, local_message_date={local_message_date}")
         file_name_text = "email_" + str(email_uid) + ".txt"
         file_name_html = "email_" + str(email_uid) + ".html"
-        #multipart/mixed,  multipart/alternative, text/html
+        #multipart/mixed,  multipart/alternative, multipart/related, text/html
         body = ""
         html_body = "" 
         if email_message.is_multipart():
             for part in email_message.walk():
                 ctype = part.get_content_type()
+                logger.error(f"This is the ctype {ctype}")
                 cdispo = str(part.get('Content-Disposition'))
 
                 # skip any text/plain (txt) attachments
@@ -197,10 +198,15 @@ class Emails(object):
         file_path_html = os.path.join(self.email_dir_html, file_name_html)
 
         with open(file_path_text, "wb") as f:
-            f.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to, local_message_date, subject, body.encode()))
+            data = f"From: {email_from}\nTo: {email_to}\nDate: {local_message_date}\nSubject: {subject}\n\nBody: \n\n{body.encode()}"
+            logger.info(f"TEXT BODY {data}")
+            f.write(data.encode())
 
         with open(file_path_html, "wb") as f:
-            f.write("From: %s\nTo: %s\nDate: %s\nSubject: %s\n\nBody: \n\n%s" %(email_from, email_to, local_message_date, subject, html_body))
+            data = f"From: {email_from}\nTo: {email_to}\nDate: {local_message_date}\nSubject: {subject}\n\nBody: \n\n{html_body.encode()}"
+            logger.info(f"HTML BODY {data}")
+            f.write(data.encode())
+
 
         logger.info("\n")
         return 
