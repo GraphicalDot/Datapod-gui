@@ -6,10 +6,16 @@ import datetime
 import email
 import imaplib
 import mailbox
-import os
+import os, sys
 import base64
-EMAIL_ACCOUNT = "your@gmail.com"
-PASSWORD = "your password"
+
+path = os.path.dirname(os.path.realpath(os.getcwd()))
+
+print (path)
+
+sys.path.append(path)
+from  analysis.bank_statements import BankStatements
+from  analysis.cab_service import CabService
 
 
 
@@ -18,7 +24,7 @@ verboselogs.install()
 coloredlogs.install()
 logger = logging.getLogger(__name__)
 
-
+DEBUG=False
 
 # result, data = mail.uid('search', None, "UNSEEN") # (ALL/UNSEEN)
 # i = len(data[0].split())
@@ -143,11 +149,28 @@ class Emails(object):
         return email_from, email_to, subject, local_message_date, email_message
 
 
+    def prefix_attachment_name(self, filename, email_uid, email_subject, email_from):
+        if BankStatements.is_bank_statement(email_subject):
+            prefix = BankStatements.which_bank(email_subject)
+
+        elif CabService.is_cab_service(email_subject):
+            prefix = CabService.which_cab_service(email_from, email_subject)
+
+        else:
+            prefix = "UNKNOWN"
+
+        return f"{prefix}_{email_uid}_{filename}"
+
+
     def save_email(self, email_uid, email_from, email_to, subject, local_message_date, email_message):
         # Body details
         logger.info(f"email_uid={email_uid}, email_from={email_from}, email_to={email_to}, subject={subject}, local_message_date={local_message_date}")
-        file_name_text = "email_" + str(email_uid) + ".txt"
-        file_name_html = "email_" + str(email_uid) + ".html"
+        
+        if isinstance(email_uid, bytes):
+            email_uid = email_uid.decode()
+
+        file_name_text = "email_" + email_uid + ".txt"
+        file_name_html = "email_" + email_uid + ".html"
         #multipart/mixed,  multipart/alternative, multipart/related, text/html
         body = ""
         html_body = ""
@@ -155,7 +178,8 @@ class Emails(object):
         if email_message.is_multipart():
             for part in email_message.walk():
                 ctype = part.get_content_type()
-                logger.error(f"This is the ctype {ctype}")
+                if DEBUG:
+                    logger.error(f"This is the ctype {ctype}")
                 cdispo = str(part.get('Content-Disposition'))
 
                 # skip any text/plain (txt) attachments
@@ -175,11 +199,15 @@ class Emails(object):
                     ##type except the attachment part 
 
                     if part.get_filename():
-                        attachment_name = part.get_filename() + "__"+ str(email_uid)
+                        #attachment_name = part.get_filename() + "__"+ str(email_uid)
+                        ##prefix attachment with TAGS like BANK, CAB, 
+                        attachment_name = self.prefix_attachment_name(
+                                part.get_filename(), email_uid, subject, email_from)
+
+
                         if ctype.startswith("image"):
                             with open(os.path.join(self.image_dir, attachment_name), "wb") as f:
                                 f.write(part.get_payload(decode=True))
-                            
                         elif ctype == "application/pdf":
                             with open(os.path.join(self.pdf_dir, attachment_name), "wb") as f:
                                 f.write(part.get_payload(decode=True))
@@ -188,19 +216,22 @@ class Emails(object):
                             with open(os.path.join(self.extra_dir, attachment_name), "wb") as f:
                                 f.write(part.get_payload(decode=True))
 
+                        logger.info(f"Attachment with name {attachment_name} and content_type {ctype} found")            
+
                         attachments += f"{attachment_name}\n"
                     else:
+                        if DEBUG:
                             logger.error(f"Mostly junk MIME type {ctype} without a file_name")
 
 
-
-            # not multipart - i.e. plain text, no attachments, keeping fingers crossed
-            pprint(body)
+            if DEBUG:
+                # not multipart - i.e. plain text, no attachments, keeping fingers crossed
+                pprint(body)
 
         else:
             #when the email is just plain text
             body = part.get_payload(decode=True)
-            logger.error("Sumple email found")
+            logger.error("email with Plaintext found, Which is rare")
 
         file_path_text = os.path.join(self.email_dir_txt, file_name_text)
         file_path_html = os.path.join(self.email_dir_html, file_name_html)
@@ -208,12 +239,14 @@ class Emails(object):
         nl = "\r\n"
         with open(file_path_text, "wb") as f:
             data = f"From: {email_from}{nl}To: {email_to}{nl}Date: {local_message_date}{nl}Attachments:{attachments}{nl}Subject: {subject}{nl}\nBody: {nl}{body.encode()}"
-            logger.info(f"TEXT BODY {data}")
+            if DEBUG:
+                logger.info(f"TEXT BODY {data}")
             f.write(data.encode())
 
         with open(file_path_html, "wb") as f:
             data = f"From: {email_from}{nl}To: {email_to}{nl}Date: {local_message_date}{nl}Attachments:{attachments}{nl}Subject: {subject}{nl}\nBody: {nl}{html_body.encode()}"
-            logger.info(f"HTML BODY {data}")
+            if DEBUG:
+                logger.info(f"HTML BODY {data}")
             f.write(data.encode())
 
 
