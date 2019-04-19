@@ -59,7 +59,7 @@ DEBUG=False
 
 
 
-class Emails(object):
+class GmailEm(object):
 
     def __init__(self, server_name, inbox_type=None, mail_type=None):
         self.server_name = server_name
@@ -302,7 +302,7 @@ class Emails(object):
 
 if __name__ == "__main__":
     logger.error("App started")
-    email_instance = Emails(SERVER)
+    email_instance = GmailEm(SERVER)
     email_instance.connect("dummy.houzier.saurav@gmail.com", "Groot1234#")
     email_instance.download_emails()
     logger.info("App Ended")
