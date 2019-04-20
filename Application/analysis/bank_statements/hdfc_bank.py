@@ -5,7 +5,8 @@ from os import listdir
 from os import path, getcwd, makedirs
 from PyPDF2 import PdfFileReader, PdfFileWriter
 import camelot
-
+import hashlib
+from analytics import Analytics
 
 def decrypt_pdf(input_path, output_path, password):
     with open(input_path, 'rb') as input_file, \
@@ -46,6 +47,8 @@ class HDFCBank(object):
 
     @staticmethod
     def is_hdfc(subject):
+        #TODO, only the emails received from hdfc bak should be counted
+
         """
         Find out from the email subject if this pdf is from HDFC bank
         """
@@ -67,7 +70,7 @@ class HDFCBank(object):
                     if path.isfile(path.join(self.pdf_folder_path, f))]
 
         self.file_names = [path.join(self.pdf_folder_path, filename) for filename in\
-                         all_files if filename.startswith("BANK_HDFC")]
+                         all_files if filename.startswith("hdfcbank")]
         print (self.file_names)
         return 
 
@@ -86,10 +89,28 @@ class HDFCBank(object):
         for filename in [f for f in listdir(self.temp_dir) \
                     if path.isfile(path.join(self.pdf_folder_path, f))]:
             
-            data += self.analyse_file(filename)
+            try:
+                data += self.analyse_file(filename)
+            except Exception as e:
+                print (f"THis file couldnt be parsed {filename}")
+        
+        
         return data
 
     def analyse_file(self, filename):
+        """
+        While reading the file the first row will be 
+        ['Date', 'Narration', 'Chq. / Ref No.', 'Value Date', 'Withdrawal Amount', 'Deposit Amount', 'Closing Balance*']
+        We will split the date and will add two new columns, the first one will be the month 
+        and second will be the year like 01 and 2018, 
+        the first column will be the hash of the narration
+
+        Return colums will be 
+        [month, year, hash_narration, narration, 'Chq. / Ref No.', 'Value Date', 'Withdrawal Amount', 'Deposit Amount', 'Closing Balance*']
+
+        Withdrwal amount will be reffered to as debit
+        Deposit amount will be reffered to as credit
+        """
         print(f"Reading file {filename}")
         pdf_reader = camelot.read_pdf(path.join(self.temp_dir, filename), pages="all")
         data = []
@@ -105,9 +126,13 @@ class HDFCBank(object):
         ##keep only the month and year, now instead of first column, 
         ##we will have two columns in the beginning, the first one will be month
         #second one will be the year and so on.
-        clean_data = [(e[0].split("/")[1], e[0].split("/")[2], e[1], e[2], e[3], e[4], e[5], e[6])
+
+        
+        clean_data = [(e[0].split("/")[1], e[0].split("/")[2],  hashlib.sha3_224("".join(e).encode()).hexdigest(), 
+                                e[1], e[2], e[3], e[4], e[5], e[6])
          for e in data[1:]]
         
+        print (f"Headers of the file is {data[0]}")
         print(f"Length of the data is {len(clean_data)}\n")
         return clean_data
 
@@ -124,4 +149,9 @@ if __name__=="__main__":
     instance =  HDFCBank("35276617", "/home/feynman/Programs/Datapod-gui/Application/user_data/mails/gmail/pdfs")
     data = instance.analyse()
     pprint(data)
+    i = 0
+    for e in data:
+        i += 1
+        if len(e) != 9:
+            print (e)
 

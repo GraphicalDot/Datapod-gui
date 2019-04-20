@@ -19,12 +19,17 @@ from  analysis.cab_service import CabService
 
 
 
-import coloredlogs, verboselogs, logging
-verboselogs.install()
-coloredlogs.install()
-logger = logging.getLogger(__name__)
+# import coloredlogs, verboselogs, logging
+# verboselogs.install()
+# coloredlogs.install()
+# logger = logging.getLogger(__name__)
 
 DEBUG=False
+
+
+from custom_logger import init_logger
+
+logger = init_logger(__name__, testing_mode=False)
 
 
 
@@ -57,17 +62,6 @@ class GmailsEMTakeout(object):
 
 
 
-    def a(self):
-        """
-        for message in mbox: 
-            print (message["subject"], message["to"], message["from"]) 
-          if from_data.get(message["from"]): 
-              from_data[message["from"]]+=1 
-          else: 
-              from_data[message["from"]] = 1 
-              dsdsdsas 
-        """
-        return 
 
     def download_emails(self):
         """
@@ -145,11 +139,17 @@ class GmailsEMTakeout(object):
 
     def handle_encoding(self, data):
         try:
-            return data.decode()
+            return data.decode() ##defaultis utf-8
         except Exception as err:
-            #logger.error(f"Error decoding html_body {data} with error {err}")
-            return data.decode('unicode_escape')
+            try:
+                #logger.error(f"Error decoding html_body {data} with error {err}")
+                return data.decode('unicode_escape')
+            except Exception as err:
+                logger.error(f"While encoding unicode_Escape {err}")
+                return "The bytes couldnt be decoded"
 
+    def format_filename(self, filename):
+        return re.sub('[^\w\-_\. ]', '_', filename).replace(" ", "")
 
 
     def save_email(self, email_from, email_to, subject, local_message_date, email_message):
@@ -200,7 +200,8 @@ class GmailsEMTakeout(object):
                     if part.get_filename():
                         #attachment_name = part.get_filename() + "__"+ str(email_uid)
                         ##prefix attachment with TAGS like BANK, CAB, 
-                        attachment_name = f"{sender_dir_name}_{sender_sub_dir_name}_{epoch}_{part.get_filename()}"
+                        _attachment_name = f"{sender_dir_name}_{sender_sub_dir_name}_{epoch}_{part.get_filename()}"
+                        attachment_name = self.format_filename(_attachment_name)
 
 
                         if ctype.startswith("image"):
@@ -283,20 +284,6 @@ class GmailsEMTakeout(object):
             logger.info(f"Creating directory HTML messages {sender_sub_dir_html}")
             os.makedirs(sender_sub_dir_html) 
         
-        """
-        self.sender_sub_dir_txt = os.path.join(self.sender_dir_txt, sender_sub_dir_name)
-        if not os.path.exists(self.sender_sub_dir_txt):
-            os.makedirs(self.sender_sub_dir_txt) 
-
-
-        self.sender_dir_html = os.path.join(self.email_dir_html, sender_dir_name)
-        if not os.path.exists(self.sender_dir_html):
-            os.makedirs(self.sender_dir_html) 
-
-        self.sender_sub_dir_html = os.path.join(sender_dir_html, sender_sub_dir_name)
-        if not os.path.exists(self.sender_sub_dir_html):
-            os.makedirs(sender_sub_dir_html) 
-        """
         return sender_sub_dir_txt, sender_sub_dir_html
 
 
@@ -313,102 +300,6 @@ class GmailsEMTakeout(object):
 
         return f"{prefix}_{email_uid}_{filename}"
 
-
-    def old_save_email(self, email_uid, email_from, email_to, subject, local_message_date, email_message):
-        # Body details
-        logger.info(f"email_uid={email_uid}, email_from={email_from}, email_to={email_to}, subject={subject}, local_message_date={local_message_date}")
-        sender_dir_name, sender_sub_dir_name = self.extract_email_from(email_from)
-        self.ensure_directory(sender_dir_name, sender_sub_dir_name)
-        logger.info("\n")
-
-        """
-        if isinstance(email_uid, bytes):
-            email_uid = email_uid.decode()
-
-        file_name_text = "email_" + email_uid + ".txt"
-        file_name_html = "email_" + email_uid + ".html"
-        #multipart/mixed,  multipart/alternative, multipart/related, text/html
-        body = ""
-        html_body = ""
-        attachments = "\n"
-        if email_message.is_multipart():
-            for part in email_message.walk():
-                ctype = part.get_content_type()
-                if DEBUG:
-                    logger.error(f"This is the ctype {ctype}")
-                cdispo = str(part.get('Content-Disposition'))
-
-                # skip any text/plain (txt) attachments
-                if ctype == 'text/plain' and 'attachment' not in cdispo:
-                    nbody = part.get_payload(decode=True)  # decode
-                    body = body + nbody.decode()
-
-                elif ctype == 'text/html' and 'attachment' not in cdispo:
-                    ##this is generally the same as text/plain but has 
-                    ##html embedded into it. save it another file with 
-                    ##html extension
-                    hbody = part.get_payload(decode=True)  # decode
-                    html_body = html_body + hbody.decode()
-
-                else:
-                    ##most of the times, this code block will have junk mime 
-                    ##type except the attachment part 
-
-                    if part.get_filename():
-                        #attachment_name = part.get_filename() + "__"+ str(email_uid)
-                        ##prefix attachment with TAGS like BANK, CAB, 
-                        attachment_name = self.prefix_attachment_name(
-                                part.get_filename(), email_uid, subject, email_from)
-
-
-                        if ctype.startswith("image"):
-                            with open(os.path.join(self.image_dir, attachment_name), "wb") as f:
-                                f.write(part.get_payload(decode=True))
-                        elif ctype == "application/pdf":
-                            with open(os.path.join(self.pdf_dir, attachment_name), "wb") as f:
-                                f.write(part.get_payload(decode=True))
-
-                        else:
-                            with open(os.path.join(self.extra_dir, attachment_name), "wb") as f:
-                                f.write(part.get_payload(decode=True))
-
-                        logger.info(f"Attachment with name {attachment_name} and content_type {ctype} found")            
-
-                        attachments += f"{attachment_name}\n"
-                    else:
-                        if DEBUG:
-                            logger.error(f"Mostly junk MIME type {ctype} without a file_name")
-
-
-            if DEBUG:
-                # not multipart - i.e. plain text, no attachments, keeping fingers crossed
-                pprint(body)
-
-        else:
-            #when the email is just plain text
-            body = part.get_payload(decode=True)
-            logger.error("email with Plaintext found, Which is rare")
-
-        file_path_text = os.path.join(self.email_dir_txt, file_name_text)
-        file_path_html = os.path.join(self.email_dir_html, file_name_html)
-
-        nl = "\r\n"
-        with open(file_path_text, "wb") as f:
-            data = f"From: {email_from}{nl}To: {email_to}{nl}Date: {local_message_date}{nl}Attachments:{attachments}{nl}Subject: {subject}{nl}\nBody: {nl}{body.encode()}"
-            if DEBUG:
-                logger.info(f"TEXT BODY {data}")
-            f.write(data.encode())
-
-        with open(file_path_html, "wb") as f:
-            data = f"From: {email_from}{nl}To: {email_to}{nl}Date: {local_message_date}{nl}Attachments:{attachments}{nl}Subject: {subject}{nl}\nBody: {nl}{html_body.encode()}"
-            if DEBUG:
-                logger.info(f"HTML BODY {data}")
-            f.write(data.encode())
-
-
-        logger.info("\n")
-        """
-        return 
 
 
 if __name__ == "__main__":
