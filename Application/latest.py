@@ -34,11 +34,12 @@ from kivy.clock import Clock
 import database_calls
 import datetime
 import time
+import sys
 
 
 
 
-store = JsonStore('config.json')
+#store = JsonStore('config.json')
 
 
 
@@ -71,7 +72,6 @@ class MessageButton(IRightBodyTouch, MDCheckbox):
     def on_release(self):
         # sample code:
         #Dialer.send_sms(phone_number, "Hey! What's up?")
-        Logger.info(f"{self.id} has been clicked")
         return 
 
 class MainApp(App):
@@ -101,7 +101,7 @@ class MainApp(App):
         return 
 
     def build(self):
-        import sys
+        print ("App done")
         if getattr(sys, 'frozen', False):
             # frozen
             dir_ = os.path.dirname(sys.executable)
@@ -118,27 +118,32 @@ class MainApp(App):
         # self.main_widget.ids.text_field_error.bind(
         #     on_text_validate=self.set_error_message,
         #     on_focus=self.set_error_message)
+        
+        """
         if database_calls.get("instagram"):
             self.update_instagram_images_list()
         self.bottom_navigation_remove_mobile(self.main_widget)
+        """
         #__list = Factory.Lists()
+        print ("App done")
         return self.main_widget
 
 
 
     def on_start(self):
-        """
+        print ("App Start")
         if not os.path.join(os.getcwd(),  INSTAGRAM_DIR):
-            Logger.warning(f"{INSTAGRAM_DIR} doesnt exists, Creating one")
+            Logger.warning("%s doesnt exists, Creating one"%INSTAGRAM_DIR)
             os.mkdir(INSTAGRAM_DIR)
         else:
-            Logger.warning(f"{INSTAGRAM_DIR} exists at {os.path.join(os.getcwd(),  INSTAGRAM_DIR)} ")
-
+            #Logger.warning("%s exists at {os.path.join(os.getcwd(),  INSTAGRAM_DIR)}")
+            pass
 
 
         password_found = database_calls.get("password")
-            
-        Logger.info(f"This is the password i found {password_found}")
+        print ("App Check one")
+        
+        #Logger.info(f"This is the password i found {password_found}")
         if password_found:
             Logger.info("Password found")
             self.main_widget.ids.login_grid_layout.remove_widget(self.main_widget.ids.button_login)
@@ -151,6 +156,7 @@ class MainApp(App):
         else:
             self.main_widget.ids.login_grid_layout.remove_widget(self.main_widget.ids.button_logout)
 
+        print ("App Check Two")
 
         if database_calls.get("mnemonic"):
             self.main_widget.ids.login_grid_layout.remove_widget(self.main_widget.ids.button_mnemonic)
@@ -163,13 +169,12 @@ class MainApp(App):
             
 
             address = database_calls.get("address")
-            Logger.info(f"YOur address on the blockchain is {address}")
+            #Logger.info(f"YOur address on the blockchain is {address}")
             self.address = str(address)
             #self.main_widget.ids.login_box.add_widget(self.main_widget.ids.repeat_passphrase)
         else:
             self.main_widget.ids.login_box.remove_widget(self.main_widget.ids.button_login)
 
-        """
         return 
 
     def update_instagram_images_list(self):
@@ -177,8 +182,8 @@ class MainApp(App):
         for image in thumbnails:
 
             item = TwoLineAvatarIconListItem(
-            text=f"Top Liker [ {image['top_likers'][0]} ]",
-            secondary_text=f"Total likes {image['likes']}"        )
+            text="Top Liker [%s]"%image['top_likers'][0],
+            secondary_text="Total likes %s"%image['likes'])
             item.add_widget(ContactPhoto(source =image["disk_name"]))
             item.add_widget(MessageButton(id=image["id"]))
             self.main_widget.ids.scroll.add_widget(item)
@@ -330,8 +335,8 @@ class MainApp(App):
 
     def on_instagram_login(self, username, password):
         try:
-            Logger.info(f"Instagram username is {username.text}")
-            Logger.info(f"Instagram password is {password.text}")
+            #Logger.info(f"Instagram username is {username.text}")
+            #Logger.info(f"Instagram password is {password.text}")
             instagram_object = instagram_login(username.text, password.text)
             #self.loading_box()
             #Snackbar(text="Please wait for sometime, lets us fetch your Insta Handle").show()
@@ -355,14 +360,14 @@ class MainApp(App):
     def instagram_last(self):
             try:
                 data = database_calls.get("instagram_last_fetch_utc")
-                Logger.info(f"Instagram data stored in local storage {data}")
-                Logger.info(f"Instagram Last fectehd locally is {data}")
+                #Logger.info(f"Instagram data stored in local storage {data}")
+                #Logger.info(f"Instagram Last fectehd locally is {data}")
 
                 result = datetime.datetime.fromtimestamp(data).strftime("%d %B, %Y")
-                Logger.info(f"Human readable last fecthed {result}")
+                #Logger.info(f"Human readable last fecthed {result}")
                 return result
             except Exception as e:
-                Logger.info(f"Error in lest fecthed dtiem stamp UTC {e.__str__()}")
+                #Logger.info(f"Error in lest fecthed dtiem stamp UTC {e.__str__()}")
                 return ""
 
 
@@ -391,20 +396,20 @@ class MainApp(App):
 
     def decrypt_mnemonic(self, password):
         encrypted_mnemonic = database_calls.get("mnemonic")
-        Logger.info(f"Encrypted Mnemonic is {encrypted_mnemonic}")
+        #Logger.info(f"Encrypted Mnemonic is {encrypted_mnemonic}")
         salt = database_calls.get("password_salt")
-        Logger.info(f"Password salt is {salt}")
+        #Logger.info(f"Password salt is {salt}")
 
         
         scrypt_key, salt = generate_scrypt_key(password, bytes.fromhex(salt))
         time.sleep(0.1)
 
-        Logger.info(f"scrypt_key from password {scrypt_key.hex()} and salt is {salt.hex()}")
+        #Logger.info(f"scrypt_key from password {scrypt_key.hex()} and salt is {salt.hex()}")
 
 
         try:
             mnemonic = aes_decrypt(scrypt_key, bytes.fromhex(encrypted_mnemonic))
-            Logger.info(f"State of Mnemonic widget {self.main_widget.ids.mnemonic}")
+            #Logger.info(f"State of Mnemonic widget {self.main_widget.ids.mnemonic}")
             if not self.main_widget.ids.mnemonic:
                 self.main_widget.ids.login_box.add_widget(self.main_widget.ids.mnemonic)
             self.mnemonic = mnemonic.decode()           
@@ -467,7 +472,7 @@ class MainApp(App):
         #TODO Check if macid is available from the host or not
         #TODO check if ip address
 
-        r = requests.get(f"http://{store.get('GO_API')}/get_mnemonic")
+        r = requests.get("http://%s/get_mnemonic"%store.get('GO_API'))
         mnemonic = r.json()["data"]["mnemonic"]
         zeroth_private_key = r.json()["data"]["zeroth_private_key"]
         zeroth_public_key = r.json()["data"]["zeroth_public_key"]
