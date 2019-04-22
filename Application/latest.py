@@ -30,11 +30,10 @@ from kivy.logger import Logger
 from kivy.uix.image import AsyncImage
 from kivymd.list import TwoLineAvatarIconListItem
 from kivymd.selectioncontrols import MDCheckbox
-
+from kivy.clock import Clock
 import database_calls
 import datetime
-
-
+import time
 
 
 
@@ -112,7 +111,7 @@ class MainApp(App):
         self.main_widget =Builder.load_file(
             os.path.join(dir_, "./latest.kv")
         )
-        self.theme_cls.theme_style = 'Dark'
+        self.theme_cls.theme_style = 'Light'
 
         # self.theme_cls.theme_style = 'Dark'
 
@@ -127,8 +126,8 @@ class MainApp(App):
 
 
 
-
     def on_start(self):
+        """
         if not os.path.join(os.getcwd(),  INSTAGRAM_DIR):
             Logger.warning(f"{INSTAGRAM_DIR} doesnt exists, Creating one")
             os.mkdir(INSTAGRAM_DIR)
@@ -145,6 +144,7 @@ class MainApp(App):
             self.main_widget.ids.login_grid_layout.remove_widget(self.main_widget.ids.button_login)
             self.main_widget.ids.login_box.remove_widget(self.main_widget.ids.passphrase)
             #self.main_widget.ids.login_box.add_widget(self.main_widget.ids.mnemonic)
+            time.sleep(0.1)
             
             self.decrypt_mnemonic(password_found)
 
@@ -169,7 +169,7 @@ class MainApp(App):
         else:
             self.main_widget.ids.login_box.remove_widget(self.main_widget.ids.button_login)
 
-
+        """
         return 
 
     def update_instagram_images_list(self):
@@ -397,6 +397,8 @@ class MainApp(App):
 
         
         scrypt_key, salt = generate_scrypt_key(password, bytes.fromhex(salt))
+        time.sleep(0.1)
+
         Logger.info(f"scrypt_key from password {scrypt_key.hex()} and salt is {salt.hex()}")
 
 
@@ -420,7 +422,7 @@ class MainApp(App):
         When a user clicks on the login button on the login page
         """
         self.decrypt_mnemonic(passphrase.text)
-
+        time.sleep(0.1)
         Snackbar(text="Login is successful").show()
         database_calls.insert("password", passphrase.text, db_instance=None)
 
